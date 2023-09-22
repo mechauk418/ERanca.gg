@@ -162,7 +162,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://sub.example.com",
     "http://localhost:8080",
     "http://127.0.0.1:9000",
-    'http://ancatest-env-1.eba-brurwfkt.ap-northeast-2.elasticbeanstalk.com/'
+    'http://testenv.eba-brurwfkt.ap-northeast-2.elasticbeanstalk.com/'
 ]
 
 SITE_ID = 1
@@ -198,7 +198,7 @@ from datetime import timedelta
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8080',
-    'http://ancatest-env-1.eba-brurwfkt.ap-northeast-2.elasticbeanstalk.com/'
+    'http://testenv.eba-brurwfkt.ap-northeast-2.elasticbeanstalk.com/'
 
 ]
 
