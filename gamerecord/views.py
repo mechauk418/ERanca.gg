@@ -14,9 +14,12 @@ from character.models import Character, Item
 from django.utils import timezone
 import json
 from django_filters.rest_framework import DjangoFilterBackend
+import os
 
 # 현재 한국 시간 aware 설정
 now_time = timezone.localtime(timezone.now())
+
+apikey = os.getenv("x_api_key")
 
 # 티어, 등급 딕셔너리
 tiervalue = {
@@ -40,7 +43,7 @@ def refreshuser(nickname):
     time.sleep(0.02)
     userNum = requests.get(
         f'https://open-api.bser.io/v1/user/nickname?query={nickname}',
-        headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
+        headers={'x-api-key':apikey}
     )
 
     userNum_json = userNum.json()
@@ -50,7 +53,7 @@ def refreshuser(nickname):
     time.sleep(0.02)
     userstats = requests.get(
         f'https://open-api.bser.io/v1/user/stats/{userNum}/19',
-        headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
+        headers={'x-api-key':apikey}
     ).json()['userStats'][0]
 
     user = Gameuser.objects.get(userNum = userstats['userNum'])
@@ -71,7 +74,7 @@ def getusernum(nickname):
     time.sleep(0.02)
     userNum = requests.get(
         f'https://open-api.bser.io/v1/user/nickname?query={nickname}',
-        headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
+        headers={'x-api-key':apikey}
     )
     userNum_json = userNum.json()
     userNum = userNum_json['user']['userNum']
@@ -81,7 +84,7 @@ def getusernum(nickname):
     # 이터니티, 데미갓 티어 커트라인 점수를 구함
     top1000 = requests.get(
     f'https://open-api.bser.io/v1/rank/top/19/3',
-    headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}).json()['topRanks']
+    headers={'x-api-key':apikey}).json()['topRanks']
 
     eternity = top1000[199]['mmr']
     demigod = top1000[799]['mmr']
@@ -91,7 +94,7 @@ def getusernum(nickname):
     time.sleep(0.02)
     userstats = requests.get(
         f'https://open-api.bser.io/v1/user/stats/{userNum}/19',
-        headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
+        headers={'x-api-key':apikey}
     ).json()['userStats'][0]
 
     # 처음 검색해서 DB에 유저가 없음
@@ -114,7 +117,7 @@ def getusernum(nickname):
     time.sleep(0.02)
     match = requests.get(
         f'https://open-api.bser.io/v1/user/games/{userNum}',
-        headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
+        headers={'x-api-key':apikey}
     ).json()
     matchdetail = match['userGames']
     
@@ -139,13 +142,13 @@ def getusernum(nickname):
             time.sleep(0.02)
             gamepost = requests.get(
                 f'https://open-api.bser.io/v1/games/{game["gameId"]}',
-                headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
+                headers={'x-api-key':apikey}
             )
             gamepost = gamepost.json()
             # if 'userGames' not in gamepost:
             #                    gamepost = requests.get(
             #     f'https://open-api.bser.io/v1/games/{game["gameId"]}',
-            #     headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
+            #     headers={'x-api-key':apikey}
             #     ).json()
             
 
@@ -215,12 +218,12 @@ def getusernum(nickname):
             time.sleep(0.02)
             match = requests.get(
                 f'https://open-api.bser.io/v1/user/games/{userNum}?next={next_number}',
-                headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'})
+                headers={'x-api-key':apikey})
             match = match.json()
             # while 'userGames' not in match:
             #     match = requests.get(
             #     f'https://open-api.bser.io/v1/user/games/{userNum}?next={next_number}',
-            #     headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}).json()
+            #     headers={'x-api-key':apikey}).json()
             matchdetail = match['userGames']
             upt = matchdetail[0]['startDtm']
             test_time = datetime(int(upt[0:4]),int(upt[5:7]),int(upt[8:10]), int(upt[11:13]), int(upt[14:16]), int(upt[17:19])  )
@@ -253,13 +256,13 @@ def getusernum(nickname):
                     time.sleep(0.02)
                     gamepost = requests.get(
                         f'https://open-api.bser.io/v1/games/{game["gameId"]}',
-                        headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
+                        headers={'x-api-key':apikey}
                     )
                     gamepost = gamepost.json()
                     # while 'userGames' not in gamepost:
                     #                            gamepost = requests.get(
                     #     f'https://open-api.bser.io/v1/games/{game["gameId"]}',
-                    #     headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
+                    #     headers={'x-api-key':apikey}
                     #     ).json()
 
                     for g in gamepost['userGames']:
@@ -339,14 +342,14 @@ def refreshrecord(nickname):
     time.sleep(0.02)
     userNum = requests.get(
         f'https://open-api.bser.io/v1/user/nickname?query={nickname}',
-        headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
+        headers={'x-api-key':apikey}
     )
     userNum_json = userNum.json()
     userNum = userNum_json['user']['userNum']
     
     top1000 = requests.get(
     f'https://open-api.bser.io/v1/rank/top/19/3',
-    headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}).json()['topRanks']
+    headers={'x-api-key':apikey}).json()['topRanks']
 
     eternity = top1000[199]['mmr']
     demigod = top1000[799]['mmr']
@@ -357,7 +360,7 @@ def refreshrecord(nickname):
     time.sleep(0.02)
     userstats = requests.get(
         f'https://open-api.bser.io/v1/user/stats/{userNum}/19',
-        headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
+        headers={'x-api-key':apikey}
     ).json()['userStats'][0]
 
     # 처음 검색해서 DB에 유저가 없음
@@ -380,7 +383,7 @@ def refreshrecord(nickname):
     time.sleep(0.02)
     match = requests.get(
         f'https://open-api.bser.io/v1/user/games/{userNum}',
-        headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
+        headers={'x-api-key':apikey}
     ).json()
     matchdetail = match['userGames']
     
@@ -401,13 +404,13 @@ def refreshrecord(nickname):
             time.sleep(0.02)
             gamepost = requests.get(
                 f'https://open-api.bser.io/v1/games/{game["gameId"]}',
-                headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
+                headers={'x-api-key':apikey}
             )
             gamepost = gamepost.json()
             # if 'userGames' not in gamepost:
             #                    gamepost = requests.get(
             #     f'https://open-api.bser.io/v1/games/{game["gameId"]}',
-            #     headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
+            #     headers={'x-api-key':apikey}
             #     ).json()
             
 
@@ -483,12 +486,12 @@ def refreshrecord(nickname):
             time.sleep(0.02)
             match = requests.get(
                 f'https://open-api.bser.io/v1/user/games/{userNum}?next={next_number}',
-                headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'})
+                headers={'x-api-key':apikey})
             match = match.json()
             # while 'userGames' not in match:
             #     match = requests.get(
             #     f'https://open-api.bser.io/v1/user/games/{userNum}?next={next_number}',
-            #     headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}).json()
+            #     headers={'x-api-key':apikey}).json()
             matchdetail = match['userGames']
             upt = matchdetail[0]['startDtm']
             test_time = datetime(int(upt[0:4]),int(upt[5:7]),int(upt[8:10]), int(upt[11:13]), int(upt[14:16]), int(upt[17:19])  )
@@ -518,13 +521,13 @@ def refreshrecord(nickname):
                     time.sleep(0.02)
                     gamepost = requests.get(
                         f'https://open-api.bser.io/v1/games/{game["gameId"]}',
-                        headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
+                        headers={'x-api-key':apikey}
                     )
                     gamepost = gamepost.json()
                     # while 'userGames' not in gamepost:
                     #                            gamepost = requests.get(
                     #     f'https://open-api.bser.io/v1/games/{game["gameId"]}',
-                    #     headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
+                    #     headers={'x-api-key':apikey}
                     #     ).json()
 
                     for g in gamepost['userGames']:
@@ -694,14 +697,14 @@ def gainrp(request):
 
     top1000 = requests.get(
     f'https://open-api.bser.io/v1/rank/top/19/3',
-    headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}).json()['topRanks']
+    headers={'x-api-key':apikey}).json()['topRanks']
 
     for user in top1000:
         userNum = user['userNum']
         time.sleep(0.02)
         match = requests.get(
             f'https://open-api.bser.io/v1/user/games/{userNum}',
-            headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
+            headers={'x-api-key':apikey}
         ).json()
         matchdetail = match['userGames']
     
@@ -734,12 +737,12 @@ def gainrp(request):
                     time.sleep(0.02)
                     match = requests.get(
                         f'https://open-api.bser.io/v1/user/games/{userNum}?next={next_number}',
-                        headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'})
+                        headers={'x-api-key':apikey})
                     match = match.json()
                     # while 'userGames' not in match:
                     #     match = requests.get(
                     #     f'https://open-api.bser.io/v1/user/games/{userNum}?next={next_number}',
-                    #     headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}).json()
+                    #     headers={'x-api-key':apikey}).json()
                     matchdetail = match['userGames']
                     upt = matchdetail[0]['startDtm']
 
