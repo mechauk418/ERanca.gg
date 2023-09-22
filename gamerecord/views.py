@@ -802,3 +802,4 @@ def gainrp(request):
     return JsonResponse(alldict)
 
 
+## de6
