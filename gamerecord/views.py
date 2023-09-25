@@ -19,7 +19,7 @@ import os
 # 현재 한국 시간 aware 설정
 now_time = timezone.localtime(timezone.now())
 
-apikey = os.getenv("x_api_key")
+apikey = os.getenv("X_API_KEY")
 
 # 티어, 등급 딕셔너리
 tiervalue = {
