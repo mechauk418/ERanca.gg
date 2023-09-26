@@ -163,6 +163,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",
     "http://127.0.0.1:9000",
     'http://ancacaca-env.eba-bdkhrdpq.ap-northeast-2.elasticbeanstalk.com',
+    'https://ancacaca-env.eba-bdkhrdpq.ap-northeast-2.elasticbeanstalk.com',
+    "https://eranca.kro.kr",
+    "http://eranca.kro.kr"
 ]
 
 SITE_ID = 1
@@ -198,7 +201,10 @@ from datetime import timedelta
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8080',
-    'http://ancacaca-env.eba-bdkhrdpq.ap-northeast-2.elasticbeanstalk.com'
+    'http://ancacaca-env.eba-bdkhrdpq.ap-northeast-2.elasticbeanstalk.com',
+    'https://ancacaca-env.eba-bdkhrdpq.ap-northeast-2.elasticbeanstalk.com',
+    "https://eranca.kro.kr",
+    "http://eranca.kro.kr",
 
 ]
 
