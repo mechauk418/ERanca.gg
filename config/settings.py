@@ -248,9 +248,9 @@ else:
     AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
 
     AWS_REGION = "ap-northeast-2"
-    AWS_S3_CUSTOM_DOMAIN = "%s.s3.%s.amazonaws.com" % (
-        AWS_STORAGE_BUCKET_NAME,
+    AWS_S3_CUSTOM_DOMAIN = "s3.%s.amazonaws.com/%s/" % (
         AWS_REGION,
+        AWS_STORAGE_BUCKET_NAME,
     )
 
     DATABASES = {
