@@ -218,6 +218,7 @@ CSRF_COOKIE_HTTPONLY =True
 SECURE_CROSS_ORIGIN_OPENER_POLICY=None
 SESSION_COOKIE_SECURE=False
 
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # MEDIA_URL = '/media/'
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -237,6 +238,7 @@ if DEBUG:
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
 
 else:   
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
