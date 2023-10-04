@@ -157,16 +157,13 @@ CORS_ALLOW_HEADERS = [ # 허용할 헤더
 ]
 CORS_ALLOW_CREDENTIALS = True
 
-# CORS_ALLOWED_ORIGINS = [
-#     "https://example.com",
-#     "https://sub.example.com",
-#     "http://localhost:8080",
-#     "http://127.0.0.1:9000",
-#     'http://ancacaca-env.eba-bdkhrdpq.ap-northeast-2.elasticbeanstalk.com',
-#     'https://ancacaca-env.eba-bdkhrdpq.ap-northeast-2.elasticbeanstalk.com',
-#     "https://eranca.kro.kr",
-#     "http://eranca.kro.kr"
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "https://example.com",
+    "https://sub.example.com",
+    "http://localhost:8080",
+    "http://127.0.0.1:9000",
+    'https://port-0-eranca-gg-jvpb2alnb33u83.sel5.cloudtype.app',
+]
 
 CORS_ORIGIN_ALLOW_ALL = True
 
