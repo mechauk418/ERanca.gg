@@ -210,6 +210,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://eranca.kro.kr",
     "https://www.eranca.kro.kr",
     "http://www.eranca.kro.kr",
+    'https://port-0-eranca-gg-jvpb2alnb33u83.sel5.cloudtype.app',
 ]
 
 CSRF_COOKIE_SAMESITE='Lax'
@@ -218,7 +219,6 @@ CSRF_COOKIE_HTTPONLY =True
 SECURE_CROSS_ORIGIN_OPENER_POLICY=None
 SESSION_COOKIE_SECURE=False
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # MEDIA_URL = '/media/'
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -263,3 +263,6 @@ else:
             "PORT": "5432",
         }
     }
+    MEDIA_URL = "http://%s/media/" % AWS_S3_CUSTOM_DOMAIN
+    STATIC_URL = "http://%s/static/" % AWS_S3_CUSTOM_DOMAIN
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
