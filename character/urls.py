@@ -9,4 +9,5 @@ urlpatterns = [
     path("characterload/", Characterload),
     path("itemload/", Itemload),
     path("rpview/", CharacterRPView.as_view({'get':'list', 'post':'create'})),
+    path("item/<int:pk>", ItemView.as_view({'get':'retrieve', "put": "update", "patch": "partial_update"}))
 ]
