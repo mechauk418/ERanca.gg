@@ -662,7 +662,7 @@ def recentgainrp(request,nickname):
     userrecord = Record.objects.filter(user = userid, startDtm__range=[date.today()-timedelta(days=14),date.today()])
 
     for g in userrecord:
-        chname = Character.objects.get(id=g.character).koreanname
+        chname = Character.objects.get(id=g.character).name
         ch_dict[chname]+=g.mmrGain
         ch2_dict[chname]+=1
 
