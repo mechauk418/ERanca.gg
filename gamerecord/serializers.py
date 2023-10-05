@@ -8,6 +8,21 @@ import math
 
 now_time = timezone.localtime(timezone.now())
 
+tiervalue = {
+    0:"아이언",
+    1:'브론즈',
+    2:'실버',
+    3:'골드',
+    4:'플래티넘',
+    5:'다이아몬드',
+}
+
+gradevalue = {
+    0:"4",
+    1:'3',
+    2:'2',
+    3:'1',
+}
 
 class GameDetailSerializer(serializers.ModelSerializer):
 
@@ -28,6 +43,9 @@ class GameDetailSerializer(serializers.ModelSerializer):
 class GameuserSerializer(serializers.ModelSerializer):
 
     averageDamage = serializers.SerializerMethodField()
+    tier = serializers.SerializerMethodField()
+    grade = serializers.SerializerMethodField()
+    RP = serializers.SerializerMethodField()
 
     def get_averageDamage(self,obj):
 
@@ -37,9 +55,41 @@ class GameuserSerializer(serializers.ModelSerializer):
             sumDamage += game.damageToPlayer
 
         avgD = int(sumDamage/len(games))
-
         
         return avgD
+    
+    def get_tier(self,obj):
+
+        tiers = obj.mmr
+
+        if tiers < 6000:
+            return tiervalue[tiers//1000]
+        else:
+            if obj.rank<=200:
+                return '이터니티'
+            elif obj.rank<=700:
+                return '데미갓'
+            else:
+                return '미스릴'
+            
+    def get_grade(self,obj):
+
+        tiers = obj.mmr
+
+        if tiers < 6000:
+            return gradevalue[(tiers%1000)//250]
+
+        else:
+            return ''
+            
+    def get_RP(self,obj):
+
+        tiers = obj.mmr
+
+        if tiers < 6000:
+            return str(tiers%250)
+        else:
+            return str(tiers-6000)
 
 
     class Meta:
