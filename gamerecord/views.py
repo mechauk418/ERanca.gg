@@ -690,7 +690,12 @@ def testrp(request,nickname):
 
 def timetest(request):
 
-    return HttpResponse(now_time)
+    ABCDE = []
+    ABCDE.append(now_time)
+    temt = timezone.now()
+    ABCDE.append(temt)
+
+    return HttpResponse(ABCDE)
 
 def gainrp(request):
     sttime = time.time()
