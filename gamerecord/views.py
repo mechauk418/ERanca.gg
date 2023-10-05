@@ -17,7 +17,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 import os
 
 # 현재 한국 시간 aware 설정
-now_time = timezone.localtime(timezone.now())
+
 
 apikey = os.getenv("X_API_KEY")
 
@@ -69,6 +69,7 @@ def refreshuser(nickname):
 
 def getusernum(nickname):
     sttime = time.time()
+    now_time = timezone.localtime(timezone.now())
     # 유저 닉네임으로 유저 정보 받아옴
     
     time.sleep(0.02)
@@ -338,7 +339,7 @@ def getusernum(nickname):
 # 전적 갱신
 def refreshrecord(nickname):
     sttime = time.time()
-    print('start')
+    now_time = timezone.localtime(timezone.now())
     # 유저 닉네임으로 유저 정보 받아옴
     time.sleep(0.02)
     userNum = requests.get(
@@ -689,7 +690,7 @@ def testrp(request,nickname):
     return refreshrecord(nickname)
 
 def timetest(request):
-
+    now_time = timezone.localtime(timezone.now())
     ABCDE = []
     ABCDE.append(now_time)
     temt = timezone.now()
