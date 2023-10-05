@@ -338,6 +338,7 @@ def getusernum(nickname):
 # 전적 갱신
 def refreshrecord(nickname):
     sttime = time.time()
+    print('start')
     # 유저 닉네임으로 유저 정보 받아옴
     time.sleep(0.02)
     userNum = requests.get(
@@ -687,7 +688,9 @@ def testrp(request,nickname):
 
     return refreshrecord(nickname)
 
+def timetest(request):
 
+    return HttpResponse(now_time)
 
 def gainrp(request):
     sttime = time.time()
