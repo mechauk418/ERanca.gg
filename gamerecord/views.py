@@ -698,7 +698,7 @@ def timetest(request):
 
     return HttpResponse(ABCDE)
 
-def gainrp(request):
+def gainrp():
     sttime = time.time()
     alldict = dict()
     mmrdict=defaultdict(int)
@@ -706,7 +706,7 @@ def gainrp(request):
 
     top1000 = requests.get(
     f'https://open-api.bser.io/v1/rank/top/19/3',
-    headers={'x-api-key':apikey}).json()['topRanks']
+    headers={'x-api-key':apikey}).json()['topRanks'][0:5]
 
     for user in top1000:
         userNum = user['userNum']
@@ -806,9 +806,4 @@ def gainrp(request):
         ch.trygame7days = i['trygame']
         ch.save()
         
-    edtime = time.time()
-
-    return JsonResponse(alldict)
-
-
-## de6
+gainrp()

@@ -12,7 +12,6 @@ urlpatterns = [
     path("getdetail/", UserDetailView.as_view({'get':'list'})),
     path("recentgainrp/<str:nickname>/", recentgainrp),
     path("testrp/<str:nickname>/", testrp),
-    path('gainrp/',gainrp),
     path("userch/<str:nickname>/", UseChView.as_view({'get':'retrieve'})),
     path('timetest/',timetest),
 ]
