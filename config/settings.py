@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     'django_filters',
     'character',
     'gamerecord',
-    "storages"
+    "storages",
+    'articles'
 ]
 
 MIDDLEWARE = [

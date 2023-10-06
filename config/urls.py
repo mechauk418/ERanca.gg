@@ -24,4 +24,5 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path("character/", include("character.urls")),
     path("gamerecord/", include("gamerecord.urls")),
+    path("articles/", include("articles.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

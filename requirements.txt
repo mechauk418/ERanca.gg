@@ -11,6 +11,7 @@ Django==4.2.2
 django-allauth==0.54.0
 django-cors-headers==4.1.0
 django-filter==23.2
+django-resized==1.0.2
 django-restframework==0.0.1
 django-shortcuts==1.6
 django-storages==1.14
