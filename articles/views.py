@@ -12,14 +12,18 @@ from django.db.models import Count
 
 def modify_article(request,pk):
 
-    article = Article.objects.get(pk=pk)
-    if request.data['password'] == article.password:
+    if request.method == 'POST':
+        article = Article.objects.get(pk=pk)
+        check_result = {}
+        if request.data['password'] == article.password:
+            check_result['result'] = 'True'
 
-        return True
-    
-    else:
+            return check_result
         
-        raise ValueError('비밀번호가 다릅니다')
+        else:
+            check_result['result'] = 'False'
+
+            return check_result
 
 
 
