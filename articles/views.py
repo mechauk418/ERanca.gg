@@ -16,9 +16,9 @@ from django.views.decorators.csrf import csrf_exempt
 def modify_article(request):
 
     if request.method == 'POST':
-        article = Article.objects.get(pk=request.GET.get['article_pk'])
+        article = Article.objects.get(pk=request.GET.get('article_pk'))
         check_result = {}
-        if request.GET.get['password'] == article.password:
+        if request.GET.get('password') == article.password:
             check_result['result'] = 'True'
 
             return check_result
