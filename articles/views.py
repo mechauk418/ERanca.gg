@@ -20,12 +20,12 @@ def modify_article(request):
         if request.data['password'] == article.password:
             check_result['result'] = 'True'
 
-            return check_result
+            return Response(check_result)
         
         else:
             check_result['result'] = 'False'
 
-            return check_result
+            return Response(check_result)
 
 
 
