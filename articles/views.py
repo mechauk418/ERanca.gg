@@ -10,10 +10,10 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import Count
 
 
-def modify_article(request,pk):
+def modify_article(request):
 
     if request.method == 'POST':
-        article = Article.objects.get(pk=pk)
+        article = Article.objects.get(pk=request.data['article_pk'])
         check_result = {}
         if request.data['password'] == article.password:
             check_result['result'] = 'True'
