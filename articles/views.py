@@ -15,9 +15,9 @@ from rest_framework.decorators import api_view
 def modify_article(request):
 
     if request.method == 'POST':
-        article = Article.objects.get(pk=int(request.GET.get('article_pk')))
+        article = Article.objects.get(pk=int(request.data['article_pk']))
         check_result = {}
-        if request.GET.get('password') == article.password:
+        if request.data['password'] == article.password:
             check_result['result'] = 'True'
 
             return check_result
