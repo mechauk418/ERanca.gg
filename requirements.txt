@@ -22,6 +22,7 @@ importlib-metadata==6.7.0
 jmespath==1.0.1
 Markdown==3.4.3
 oauthlib==3.2.2
+Pillow==10.0.1
 psycopg2-binary==2.9.7
 pycparser==2.21
 PyJWT==2.7.0
