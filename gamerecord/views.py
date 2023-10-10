@@ -803,3 +803,4 @@ def gainrp():
         ch.RPeff = round(i['mmrGain'] / i['trygame'],2)
         ch.trygame7days = i['trygame']
         ch.save()
+        print(ch)

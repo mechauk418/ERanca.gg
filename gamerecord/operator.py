@@ -11,7 +11,7 @@ def start():
 
     scheduler.add_job(
         gainrp,
-        trigger=CronTrigger(day_of_week="tue", hour="12", minute="20"),
+        trigger=CronTrigger(day_of_week="tue", hour="12", minute="40"),
         max_instances=1,
         name="gainrp",
     )
