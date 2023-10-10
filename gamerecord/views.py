@@ -704,7 +704,7 @@ def gainrp():
 
     top1000 = requests.get(
     f'https://open-api.bser.io/v1/rank/top/19/3',
-    headers={'x-api-key':apikey}).json()['topRanks']
+    headers={'x-api-key':apikey}).json()['topRanks'][0:2]
 
     for user in top1000:
         userNum = user['userNum']
@@ -804,17 +804,3 @@ def gainrp():
         ch.RPeff = round(i['mmrGain'] / i['trygame'],2)
         ch.trygame7days = i['trygame']
         ch.save()
-
-import schedule
-import threading
-
-# schedule.every().day.at("11:04").do(gainrp)
-
-# step3.실행 주기 설정
-schedule.every().day.at("11:42").do(gainrp)
-
-# step4.스캐쥴 시작
-while True:
-    schedule.run_pending()
-        
-# test555

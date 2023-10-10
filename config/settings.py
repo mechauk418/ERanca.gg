@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'character',
     'gamerecord',
     "storages",
-    'articles'
+    'articles',
+    "django_apscheduler"
 ]
 
 MIDDLEWARE = [
@@ -282,3 +283,9 @@ else:
     MEDIA_URL = "http://%s/media/" % AWS_S3_CUSTOM_DOMAIN
     STATIC_URL = "http://%s/static/" % AWS_S3_CUSTOM_DOMAIN
     STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+
+APSCHEDULER_RUN_NOW_TIMEOUT = 9999999  # Seconds
+
+SCHEDULER_DEFAULT = True # apps.py 참고
