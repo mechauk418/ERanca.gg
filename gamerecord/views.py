@@ -704,7 +704,7 @@ def gainrp():
 
     top1000 = requests.get(
     f'https://open-api.bser.io/v1/rank/top/19/3',
-    headers={'x-api-key':apikey}).json()['topRanks'][0:2]
+    headers={'x-api-key':apikey}).json()['topRanks']
 
     for user in top1000:
         userNum = user['userNum']
@@ -733,7 +733,6 @@ def gainrp():
                 charater_name = Character.objects.get(id = game['characterNum']).name
                 mmrdict[charater_name] += game['mmrGain']
                 trydict[charater_name] += 1
-
 
 
             if 'next' in match:
@@ -765,7 +764,7 @@ def gainrp():
                         if game['matchingMode'] !=3:
                             continue
 
-                        elif (now_time - gametime_aware).days >= 1:
+                        elif (now_time - gametime_aware).days >= 7:
                             days_check = True
                             break
 
