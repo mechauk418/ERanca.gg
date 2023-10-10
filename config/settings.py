@@ -164,6 +164,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",
     "http://127.0.0.1:9000",
     'https://port-0-eranca-gg-jvpb2alnb33u83.sel5.cloudtype.app',
+    "https://www.rollthun.site/"
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -209,6 +210,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://www.eranca.kro.kr",
     "http://www.eranca.kro.kr",
     'https://port-0-eranca-gg-jvpb2alnb33u83.sel5.cloudtype.app',
+    'https://www.rollthun.site/'
 ]
 
 CSRF_COOKIE_SAMESITE='Lax'

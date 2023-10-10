@@ -88,9 +88,7 @@ def Itemload(request):
     for i in itemlist:
         try:
             tester_name = Item.objects.get(name=i['name'])
-            # save_path = f"C:/Users/LeeJinUk/Desktop/DRFBoard/DRFBoardfront/project/src/assets/Item/{i['code']}.png"
-            # img_url = f'https://static.inven.co.kr/image_2011/site_image/er/dataninfo/itemicon/itemicon_{i["code"]}.png?v=230901a'
-            # dwfile = req.urlretrieve(img_url, save_path)
+
 
             continue
 
