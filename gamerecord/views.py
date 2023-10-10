@@ -122,8 +122,8 @@ def getusernum(nickname):
     
     # 가져온 전적을 등록하는 과정
     for game in matchdetail:
-        
         t = game['startDtm']
+        print(t)
         gametime = datetime(int(t[0:4]),int(t[5:7]),int(t[8:10]), int(t[11:13]), int(t[14:16]), int(t[17:19]))
         gametime_aware = timezone.make_aware(gametime)
         if len(Record.objects.filter(gamenumber = game['gameId'])):
@@ -811,15 +811,10 @@ import threading
 # schedule.every().day.at("11:04").do(gainrp)
 
 # step3.실행 주기 설정
-schedule.every().day.at("11:40").do(gainrp)
+schedule.every().day.at("11:42").do(gainrp)
 
 # step4.스캐쥴 시작
-def start_schedule():
-    while True:
-        schedule.run_pending()
+while True:
+    schedule.run_pending()
         
-
-schedule_thread = threading.Thread(target = start_schedule)
-schedule_thread.start()
-
 # test555
