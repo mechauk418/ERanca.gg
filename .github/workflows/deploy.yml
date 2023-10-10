@@ -1,0 +1,59 @@
+name: Deploy to cloudtype
+on:
+  push:
+    branches:
+      - master
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Connect deploy key
+        uses: cloudtype-github-actions/connect@v1
+        with:
+          token: ${{ secrets.CLOUDTYPE_TOKEN }}
+          ghtoken: ${{ secrets.GHP_TOKEN }}
+      - name: Deploy
+        uses: cloudtype-github-actions/deploy@v1
+        with:
+          token: ${{ secrets.CLOUDTYPE_TOKEN }}
+          project: mechauk418/eranca-gg
+          stage: main
+          yaml: >
+            name: eranca-gg
+
+            app: python@3.9
+
+            options:
+              env:
+                - name: SECRET_KEY
+                  value: ${{ secrets.SECRET_KEY }}
+                - name: DEBUG
+                  value: ${{ secrets.DEBUG }}
+                - name: X_API_KEY
+                  value: ${{ secrets.X_API_KEY }}
+                - name: CLOUDTYPE_TOKEN
+                  value: ${{ secrets.CLOUDTYPE_TOKEN }}
+                - name: GHP_TOKEN
+                  value: ${{ secrets.GHP_TOKEN }}
+                - name: DATABASE_HOST
+                  value: ${{ secrets.DATABASE_HOST }}
+                - name: DATABASE_PASSWORD
+                  value: ${{ secrets.DATABASE_PASSWORD }}
+                - name: DATABASE_NAME
+                  value: ${{ secrets.DATABASE_NAME }}
+                - name: AWS_ACCESS_KEY_ID
+                  value: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                - name: AWS_SECRET_ACCESS_KEY
+                  value: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                - name: AWS_STORAGE_BUCKET_NAME
+                  value: ${{ secrets.AWS_STORAGE_BUCKET_NAME }}
+              ports: "8000"
+              start: python3 manage.py runserver 0:8000
+              prestart: python3 manage.py makemigrations && python3 manage.py migrate &&
+                python3 manage.py collectstatic --noinput
+            context:
+              git:
+                url: git@github.com:${{ github.repository }}.git
+                ref: ${{ github.ref }}

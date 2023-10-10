@@ -806,4 +806,3 @@ def gainrp():
         ch.trygame7days = i['trygame']
         ch.save()
         
-gainrp()
