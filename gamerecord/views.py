@@ -811,7 +811,7 @@ import threading
 # schedule.every().day.at("11:04").do(gainrp)
 
 # step3.실행 주기 설정
-schedule.every().day.at("11:29").do(gainrp)
+schedule.every().day.at("11:40").do(gainrp)
 
 # step4.스캐쥴 시작
 def start_schedule():
@@ -822,4 +822,4 @@ def start_schedule():
 schedule_thread = threading.Thread(target = start_schedule)
 schedule_thread.start()
 
-# test
+# test555
