@@ -16,8 +16,6 @@ import json
 from django_filters.rest_framework import DjangoFilterBackend
 import os
 
-# 현재 한국 시간 aware 설정
-
 
 apikey = os.getenv("X_API_KEY")
 
@@ -805,4 +803,3 @@ def gainrp():
         ch.RPeff = round(i['mmrGain'] / i['trygame'],2)
         ch.trygame7days = i['trygame']
         ch.save()
-        
