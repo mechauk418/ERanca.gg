@@ -696,7 +696,17 @@ def timetest(request):
 
     return HttpResponse(ABCDE)
 
-def gainrp():
+def resetrp():
+
+    allcharacter = Character.objects.all()
+
+    for ch in allcharacter:
+        ch.RPfor7days = 0
+        ch.RPeff = 0
+        ch.trygame7days = 0
+        ch.save()
+
+def gainrp(start,end):
     sttime = time.time()
     alldict = dict()
     mmrdict=defaultdict(int)
@@ -704,7 +714,7 @@ def gainrp():
 
     top1000 = requests.get(
     f'https://open-api.bser.io/v1/rank/top/19/3',
-    headers={'x-api-key':apikey}).json()['topRanks'][0:333]
+    headers={'x-api-key':apikey}).json()['topRanks'][start:end]
 
     for user in top1000:
         userNum = user['userNum']
@@ -799,233 +809,18 @@ def gainrp():
 
     for i in alldict['result']:
         ch = Character.objects.get(name=i['chname'])
-        ch.RPfor7days = i['mmrGain']
-        ch.RPeff = round(i['mmrGain'] / i['trygame'],2)
-        ch.trygame7days = i['trygame']
+        ch.RPfor7days += i['mmrGain']
+        ch.RPeff += round(i['mmrGain'] / i['trygame'],2)
+        ch.trygame7days += i['trygame']
         ch.save()
         print(ch)
     
     print('등록종료')
 
+def rpeff():
 
-def gainrp2():
-    sttime = time.time()
-    alldict = dict()
-    mmrdict=defaultdict(int)
-    trydict = defaultdict(int)
+    allcharacter = Character.objects.all()
 
-    top1000 = requests.get(
-    f'https://open-api.bser.io/v1/rank/top/19/3',
-    headers={'x-api-key':apikey}).json()['topRanks'][333:666]
-
-    for user in top1000:
-        userNum = user['userNum']
-        time.sleep(0.02)
-        match = requests.get(
-            f'https://open-api.bser.io/v1/user/games/{userNum}',
-            headers={'x-api-key':apikey}
-        ).json()
-        matchdetail = match['userGames']
-    
-        # 가져온 전적을 등록하는 과정
-        for game in matchdetail:
-            t = game['startDtm']
-            gametime = datetime(int(t[0:4]),int(t[5:7]),int(t[8:10]), int(t[11:13]), int(t[14:16]), int(t[17:19]))
-            gametime_aware = timezone.make_aware(gametime)
-
-            if game['matchingMode'] !=3:
-
-                continue
-
-            elif (now_time - gametime_aware).days >= 7:
-                break
-
-            else:
-                charater_name = Character.objects.get(id = game['characterNum']).name
-                mmrdict[charater_name] += game['mmrGain']
-                trydict[charater_name] += 1
-
-
-            if 'next' in match:
-                next_number = match['next']
-
-                while True:
-
-                    days_check = False
-                    time.sleep(0.02)
-                    match = requests.get(
-                        f'https://open-api.bser.io/v1/user/games/{userNum}?next={next_number}',
-                        headers={'x-api-key':apikey})
-                    match = match.json()
-                    # while 'userGames' not in match:
-                    #     match = requests.get(
-                    #     f'https://open-api.bser.io/v1/user/games/{userNum}?next={next_number}',
-                    #     headers={'x-api-key':apikey}).json()
-                    matchdetail = match['userGames']
-                    upt = matchdetail[0]['startDtm']
-
-
-                    # 가져온 전적을 등록하는 과정
-                    for game in matchdetail:
-                        
-                        t = game['startDtm']
-                        gametime = datetime(int(t[0:4]),int(t[5:7]),int(t[8:10]), int(t[11:13]), int(t[14:16]), int(t[17:19])  )
-                        gametime_aware = timezone.make_aware(gametime)
-
-                        if game['matchingMode'] !=3:
-                            continue
-
-                        elif (now_time - gametime_aware).days >= 7:
-                            days_check = True
-                            break
-
-                        else:
-                            charater_name = Character.objects.get(id = game['characterNum']).name
-                            mmrdict[charater_name] += game['mmrGain']
-                            trydict[charater_name] += 1
-
-
-                    # 7일이 넘은 기록부터는 가져오지 않음
-                    if days_check:
-                        break
-
-                    if 'next' in match:
-                        next_number = match['next']
-                    else:
-                        break
-
-    print('탐색종료')
-    ch2_item = list(trydict.items())
-    ch2_item.sort(key=lambda x:(-x[1]))
-
-    result_list = []
-
-    for item in ch2_item:
-        temtdict = dict()
-        temtdict['chname']=item[0]
-        temtdict['trygame']=item[1]
-        temtdict['mmrGain']=mmrdict[item[0]]
-        result_list.append(temtdict)
-        
-    alldict['result'] = result_list
-
-    for i in alldict['result']:
-        ch = Character.objects.get(name=i['chname'])
-        ch.RPfor7days = i['mmrGain']
-        ch.RPeff = round(i['mmrGain'] / i['trygame'],2)
-        ch.trygame7days = i['trygame']
+    for ch in allcharacter:
+        ch.RPeff = round(ch['mmrGain'] / ch['trygame'],2)
         ch.save()
-        print(ch)
-    
-    print('등록종료')
-
-def gainrp3():
-    sttime = time.time()
-    alldict = dict()
-    mmrdict=defaultdict(int)
-    trydict = defaultdict(int)
-
-    top1000 = requests.get(
-    f'https://open-api.bser.io/v1/rank/top/19/3',
-    headers={'x-api-key':apikey}).json()['topRanks'][666:1000]
-
-    for user in top1000:
-        userNum = user['userNum']
-        time.sleep(0.02)
-        match = requests.get(
-            f'https://open-api.bser.io/v1/user/games/{userNum}',
-            headers={'x-api-key':apikey}
-        ).json()
-        matchdetail = match['userGames']
-    
-        # 가져온 전적을 등록하는 과정
-        for game in matchdetail:
-            t = game['startDtm']
-            gametime = datetime(int(t[0:4]),int(t[5:7]),int(t[8:10]), int(t[11:13]), int(t[14:16]), int(t[17:19]))
-            gametime_aware = timezone.make_aware(gametime)
-
-            if game['matchingMode'] !=3:
-
-                continue
-
-            elif (now_time - gametime_aware).days >= 7:
-                break
-
-            else:
-                charater_name = Character.objects.get(id = game['characterNum']).name
-                mmrdict[charater_name] += game['mmrGain']
-                trydict[charater_name] += 1
-
-
-            if 'next' in match:
-                next_number = match['next']
-
-                while True:
-
-                    days_check = False
-                    time.sleep(0.02)
-                    match = requests.get(
-                        f'https://open-api.bser.io/v1/user/games/{userNum}?next={next_number}',
-                        headers={'x-api-key':apikey})
-                    match = match.json()
-                    # while 'userGames' not in match:
-                    #     match = requests.get(
-                    #     f'https://open-api.bser.io/v1/user/games/{userNum}?next={next_number}',
-                    #     headers={'x-api-key':apikey}).json()
-                    matchdetail = match['userGames']
-                    upt = matchdetail[0]['startDtm']
-
-
-                    # 가져온 전적을 등록하는 과정
-                    for game in matchdetail:
-                        
-                        t = game['startDtm']
-                        gametime = datetime(int(t[0:4]),int(t[5:7]),int(t[8:10]), int(t[11:13]), int(t[14:16]), int(t[17:19])  )
-                        gametime_aware = timezone.make_aware(gametime)
-
-                        if game['matchingMode'] !=3:
-                            continue
-
-                        elif (now_time - gametime_aware).days >= 7:
-                            days_check = True
-                            break
-
-                        else:
-                            charater_name = Character.objects.get(id = game['characterNum']).name
-                            mmrdict[charater_name] += game['mmrGain']
-                            trydict[charater_name] += 1
-
-
-                    # 7일이 넘은 기록부터는 가져오지 않음
-                    if days_check:
-                        break
-
-                    if 'next' in match:
-                        next_number = match['next']
-                    else:
-                        break
-
-    print('탐색종료')
-    ch2_item = list(trydict.items())
-    ch2_item.sort(key=lambda x:(-x[1]))
-
-    result_list = []
-
-    for item in ch2_item:
-        temtdict = dict()
-        temtdict['chname']=item[0]
-        temtdict['trygame']=item[1]
-        temtdict['mmrGain']=mmrdict[item[0]]
-        result_list.append(temtdict)
-        
-    alldict['result'] = result_list
-
-    for i in alldict['result']:
-        ch = Character.objects.get(name=i['chname'])
-        ch.RPfor7days = i['mmrGain']
-        ch.RPeff = round(i['mmrGain'] / i['trygame'],2)
-        ch.trygame7days = i['trygame']
-        ch.save()
-        print(ch)
-    
-    print('등록종료')
