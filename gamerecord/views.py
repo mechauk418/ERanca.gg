@@ -704,7 +704,7 @@ def gainrp():
 
     top1000 = requests.get(
     f'https://open-api.bser.io/v1/rank/top/19/3',
-    headers={'x-api-key':apikey}).json()['topRanks']
+    headers={'x-api-key':apikey}).json()['topRanks'][0:2]
 
     for user in top1000:
         userNum = user['userNum']
@@ -717,7 +717,6 @@ def gainrp():
     
         # 가져온 전적을 등록하는 과정
         for game in matchdetail:
-            print(game['gameId'])
             t = game['startDtm']
             gametime = datetime(int(t[0:4]),int(t[5:7]),int(t[8:10]), int(t[11:13]), int(t[14:16]), int(t[17:19]))
             gametime_aware = timezone.make_aware(gametime)
@@ -783,6 +782,7 @@ def gainrp():
                     else:
                         break
 
+    print('탐색종료')
     ch2_item = list(trydict.items())
     ch2_item.sort(key=lambda x:(-x[1]))
 
@@ -804,3 +804,5 @@ def gainrp():
         ch.trygame7days = i['trygame']
         ch.save()
         print(ch)
+    
+    print('등록종료')
