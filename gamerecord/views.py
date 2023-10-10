@@ -687,16 +687,8 @@ def testrp(request,nickname):
 
     return refreshrecord(nickname)
 
-def timetest(request):
-    now_time = timezone.localtime(timezone.now())
-    ABCDE = []
-    ABCDE.append(now_time)
-    temt = timezone.now()
-    ABCDE.append(temt)
-
-    return HttpResponse(ABCDE)
-
 def resetrp():
+    print('resetrp')
 
     allcharacter = Character.objects.all()
 
@@ -706,7 +698,10 @@ def resetrp():
         ch.trygame7days = 0
         ch.save()
 
+    return
+
 def gainrp(start,end):
+    print('gainrp')
     sttime = time.time()
     alldict = dict()
     mmrdict=defaultdict(int)
@@ -728,6 +723,7 @@ def gainrp(start,end):
         # 가져온 전적을 등록하는 과정
         for game in matchdetail:
             t = game['startDtm']
+            print(t)
             gametime = datetime(int(t[0:4]),int(t[5:7]),int(t[8:10]), int(t[11:13]), int(t[14:16]), int(t[17:19]))
             gametime_aware = timezone.make_aware(gametime)
 
@@ -817,10 +813,15 @@ def gainrp(start,end):
     
     print('등록종료')
 
+    return
+
 def rpeff():
+    print('rpeff')
 
     allcharacter = Character.objects.all()
 
     for ch in allcharacter:
         ch.RPeff = round(ch['mmrGain'] / ch['trygame'],2)
         ch.save()
+
+    return
