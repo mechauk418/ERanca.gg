@@ -45,7 +45,7 @@ class GameuserSerializer(serializers.ModelSerializer):
     averageDamage = serializers.SerializerMethodField()
     tier = serializers.SerializerMethodField()
     grade = serializers.SerializerMethodField()
-    RP = serializers.SerializerMethodField()
+    rp = serializers.SerializerMethodField()
 
     def get_averageDamage(self,obj):
 
