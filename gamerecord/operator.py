@@ -1,46 +1,31 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from django.conf import settings
-from django_apscheduler.jobstores import register_events
+from django_apscheduler.jobstores import register_events, DjangoJobStore
 from .views import gainrp, resetrp, rpeff
 
 
+def testop():
+
+    print('testop')
+    resetrp()
+    gainrp(0,333)
+    gainrp(333,666)
+    gainrp(666,1000)
+    pass
+
 def start():
+
     scheduler = BackgroundScheduler(timezone=settings.TIME_ZONE)
+    scheduler.add_jobstore(DjangoJobStore(),'default')
     register_events(scheduler)
 
     scheduler.add_job(
-        resetrp(),
-        trigger=CronTrigger(day_of_week="wed", hour="01", minute="25"),
+        testop,
+        trigger=CronTrigger(day_of_week="wed", hour="09", minute="30"),
         max_instances=1,
         name="resetrp",
     )
-
-    scheduler.add_job(
-        gainrp(0,333),
-        trigger=CronTrigger(day_of_week="wed", hour="01", minute="30"),
-        max_instances=1,
-        name="gainrp",
-    )
-    scheduler.add_job(
-        gainrp(333,666),
-        trigger=CronTrigger(day_of_week="wed", hour="01", minute="50"),
-        max_instances=1,
-        name="gainrp2",
-    )
-    scheduler.add_job(
-        gainrp(666,1000),
-        trigger=CronTrigger(day_of_week="wed", hour="02", minute="10"),
-        max_instances=1,
-        name="gainrp3",
-    )
-    scheduler.add_job(
-        rpeff(),
-        trigger=CronTrigger(day_of_week="wed", hour="02", minute="30"),
-        max_instances=1,
-        name="rpeff",
-    )
-
     scheduler.start()
 
 #test
