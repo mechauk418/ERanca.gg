@@ -701,7 +701,7 @@ def resetrp():
     return
 
 def gainrp(start,end):
-    print('gainrp')
+    print('gainrp',start,end)
     sttime = time.time()
     alldict = dict()
     mmrdict=defaultdict(int)
@@ -825,3 +825,4 @@ def rpeff():
         ch.save()
 
     return
+
