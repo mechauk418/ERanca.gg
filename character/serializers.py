@@ -14,7 +14,7 @@ class CharacterRPSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = Character
-        fields = ['name','trygame7days','RPfor7days' , 'RPeff',  ]
+        fields = ['name','trygame7days','rpfor7days' , 'rpeff',  ]
 
 
 class ItemSerializers(serializers.ModelSerializer):

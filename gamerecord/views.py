@@ -194,9 +194,9 @@ def getusernum(nickname):
                 if userrecord.beforemmr < 6000:
                     userrecord.tier = tiervalue[userrecord.beforemmr//1000]
                     userrecord.grade = gradevalue[(userrecord.beforemmr%1000)//250]
-                    userrecord.RP = str(userrecord.beforemmr%250)
+                    userrecord.rp = str(userrecord.beforemmr%250)
                 else:
-                    userrecord.RP = str(userrecord.beforemmr-6000)
+                    userrecord.rp = str(userrecord.beforemmr-6000)
                     if userrecord.beforemmr >= eternity:
                         userrecord.tier = '이터니티'
                     elif userrecord.beforemmr >= demigod:
@@ -305,9 +305,9 @@ def getusernum(nickname):
                         if userrecord.beforemmr < 6000:
                             userrecord.tier = tiervalue[userrecord.beforemmr//1000]
                             userrecord.grade = gradevalue[(userrecord.beforemmr%1000)//250]
-                            userrecord.RP = str(userrecord.beforemmr%250)
+                            userrecord.rp = str(userrecord.beforemmr%250)
                         else:
-                            userrecord.RP = str(userrecord.beforemmr-6000)
+                            userrecord.rp = str(userrecord.beforemmr-6000)
                             if userrecord.beforemmr >= eternity:
                                 userrecord.tier = '이터니티'
                             elif userrecord.beforemmr >= demigod:
@@ -463,9 +463,9 @@ def refreshrecord(nickname):
                     if userrecord.beforemmr < 6000:
                         userrecord.tier = tiervalue[userrecord.beforemmr//1000]
                         userrecord.grade = gradevalue[(userrecord.beforemmr%1000)//250]
-                        userrecord.RP = str(userrecord.beforemmr%250)
+                        userrecord.rp = str(userrecord.beforemmr%250)
                     else:
-                        userrecord.RP = str(userrecord.beforemmr-6000)
+                        userrecord.rp = str(userrecord.beforemmr-6000)
                         if userrecord.beforemmr >= eternity:
                             userrecord.tier = '이터니티'
                         elif userrecord.beforemmr >= demigod:
@@ -576,9 +576,9 @@ def refreshrecord(nickname):
                             if userrecord.beforemmr < 6000:
                                 userrecord.tier = tiervalue[userrecord.beforemmr//1000]
                                 userrecord.grade = gradevalue[(userrecord.beforemmr%1000)//250]
-                                userrecord.RP = str(userrecord.beforemmr%250)
+                                userrecord.rp = str(userrecord.beforemmr%250)
                             else:
-                                userrecord.RP = str(userrecord.beforemmr-6000)
+                                userrecord.rp = str(userrecord.beforemmr-6000)
                                 if userrecord.beforemmr >= eternity:
                                     userrecord.tier = '이터니티'
                                 elif userrecord.beforemmr >= demigod:
@@ -693,8 +693,8 @@ def resetrp():
     allcharacter = Character.objects.all()
 
     for ch in allcharacter:
-        ch.RPfor7days = 0
-        ch.RPeff = 0
+        ch.rpfor7days = 0
+        ch.rpeff = 0
         ch.trygame7days = 0
         ch.save()
 
@@ -712,7 +712,7 @@ def gainrp(start,end):
     headers={'x-api-key':apikey}).json()['topRanks'][start:end]
 
     for user in top1000:
-        print(user,user['rank'])
+        print(user['nickname'],user['rank'])
         userNum = user['userNum']
         time.sleep(0.02)
         match = requests.get(
@@ -805,8 +805,7 @@ def gainrp(start,end):
 
     for i in alldict['result']:
         ch = Character.objects.get(name=i['chname'])
-        ch.RPfor7days += i['mmrGain']
-        ch.RPeff += round(i['mmrGain'] / i['trygame'],2)
+        ch.rpfor7days += i['mmrGain']
         ch.trygame7days += i['trygame']
         ch.save()
         print(ch)
@@ -821,8 +820,9 @@ def rpeff():
     allcharacter = Character.objects.all()
 
     for ch in allcharacter:
-        ch.RPeff = round(ch['mmrGain'] / ch['trygame'],2)
-        ch.save()
+        if ch.trygame7days !=0:
+            ch.rpeff = round(ch['mmrGain'] / ch['trygame'],2)
+            ch.save()
 
     return
 

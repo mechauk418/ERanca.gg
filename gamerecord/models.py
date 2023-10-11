@@ -56,7 +56,7 @@ class Record(models.Model):
 
     tier = models.CharField(max_length=80, blank=True)
     grade = models.CharField(max_length=80, blank=True)
-    RP = models.CharField(max_length=80, blank=True)
+    rp = models.CharField(max_length=80, blank=True)
     
 
 
