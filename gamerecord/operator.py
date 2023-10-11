@@ -18,7 +18,7 @@ def start():
     scheduler.add_jobstore(DjangoJobStore(),'default')
     scheduler.add_job(
         testopop,
-        trigger=CronTrigger(day_of_week="wed", hour="12", minute="35"),
+        trigger=CronTrigger(day_of_week="wed", hour="13", minute="40"),
         id="resetrp",
         max_instances=1,
         replace_existing=True
