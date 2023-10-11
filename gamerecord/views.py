@@ -712,6 +712,7 @@ def gainrp(start,end):
     headers={'x-api-key':apikey}).json()['topRanks'][start:end]
 
     for user in top1000:
+        print(user,user['rank'])
         userNum = user['userNum']
         time.sleep(0.02)
         match = requests.get(
@@ -723,7 +724,6 @@ def gainrp(start,end):
         # 가져온 전적을 등록하는 과정
         for game in matchdetail:
             t = game['startDtm']
-            print(t)
             gametime = datetime(int(t[0:4]),int(t[5:7]),int(t[8:10]), int(t[11:13]), int(t[14:16]), int(t[17:19]))
             gametime_aware = timezone.make_aware(gametime)
 
