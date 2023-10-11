@@ -22,7 +22,7 @@ def start():
 
     scheduler.add_job(
         testop,
-        trigger=CronTrigger(day_of_week="wed", hour="09", minute="30"),
+        trigger=CronTrigger(day_of_week="wed", hour="09", minute="45"),
         max_instances=1,
         name="resetrp",
     )
