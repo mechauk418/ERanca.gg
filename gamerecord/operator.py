@@ -7,6 +7,8 @@ from .views import gainrp, resetrp, rpeff
 def testopop():
     resetrp()
     gainrp(0,333)
+    gainrp(333,666)
+    gainrp(666,1000)
     rpeff()
     pass
 
@@ -16,7 +18,7 @@ def start():
     scheduler.add_jobstore(DjangoJobStore(),'default')
     scheduler.add_job(
         testopop,
-        trigger=CronTrigger(day_of_week="wed", hour="12", minute="10"),
+        trigger=CronTrigger(day_of_week="wed", hour="12", minute="35"),
         id="resetrp",
         max_instances=1,
         replace_existing=True
