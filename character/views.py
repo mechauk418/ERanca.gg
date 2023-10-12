@@ -8,6 +8,7 @@ from django.http import HttpResponse
 import urllib.request as req
 import os
 from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
 
 korean_list = ['재키','아야','피오라','매그너스','자히르','나딘','현우','하트','아이솔','리 다이린','유키','혜진','쇼우','키아라','시셀라','실비아','아드리아나','쇼이치','엠마','레녹스','로지','루크','캐시','아델라','버니스','바바라','알렉스','수아','레온','일레븐','리오','윌리엄','니키','나타폰','얀','이바','다니엘','제니','카밀로','클로에','요한','비앙카','셀린','에키온','마이','에이든','라우라','띠아','펠릭스','엘레나','프리야','아디나','마커스','칼라','에스텔','피올로','마르티나','헤이즈','아이작','타지아','이렘','테오도르','이안','바냐','데비&마를렌','아르다','아비게일']
 
@@ -76,7 +77,7 @@ class CharacterRPView(ModelViewSet):
     serializer_class = CharacterRPSerializers
     filter_backends=[filters.OrderingFilter]
     ordering_fields = ['trygame7days','rpfor7days','rpeff']
-    ordering  = ['trygame7days']
+    ordering  = ['-trygame7days']
 
 
 def Itemload(request):
