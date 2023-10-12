@@ -821,8 +821,7 @@ def rpeff():
 
     for ch in allcharacter:
         if ch.trygame7days !=0:
-            ch.rpeff = round(ch['mmrGain'] / ch['trygame'],2)
+            ch.rpeff = round(ch.rpfor7days / ch.trygame7days,2)
             ch.save()
 
     return
-

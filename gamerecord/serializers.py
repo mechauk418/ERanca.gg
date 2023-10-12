@@ -82,7 +82,7 @@ class GameuserSerializer(serializers.ModelSerializer):
         else:
             return ''
             
-    def get_RP(self,obj):
+    def get_rp(self,obj):
 
         tiers = obj.mmr
 
