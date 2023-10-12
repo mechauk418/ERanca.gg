@@ -6,7 +6,6 @@ from django.db import models
 class Character(models.Model):
 
     name = models.CharField(max_length=80)
-
     attack = models.DecimalField(max_digits=6, decimal_places=3)
     hp = models.DecimalField(max_digits=6, decimal_places=3)
     hpregen = models.DecimalField(max_digits=6, decimal_places=3)
@@ -16,8 +15,8 @@ class Character(models.Model):
     atkspeed = models.DecimalField(max_digits=6, decimal_places=3)
     speed = models.DecimalField(max_digits=6, decimal_places=3)
     koreanname = models.CharField(max_length=80, blank=True)
-    RPfor7days = models.IntegerField(blank=True, default=0)
-    RPeff = models.DecimalField(max_digits=6, decimal_places=2, blank=True, default=0)
+    rpfor7days = models.IntegerField(blank=True, default=0)
+    rpeff = models.DecimalField(max_digits=6, decimal_places=2, blank=True, default=0)
     trygame7days = models.IntegerField(blank=True, default=0)
 
 
