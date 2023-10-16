@@ -121,8 +121,8 @@ def getusernum(nickname):
     userNum_json = userNum.json()
     if userNum_json['code'] == 404:
         return '유저가 없습니다.'
-
-    userNum = userNum_json['user']['userNum']
+    else:
+        userNum = userNum_json['user']['userNum']
     
     
     
