@@ -8,4 +8,4 @@ class GamerecordConfig(AppConfig):
     def ready(self):
         if settings.SCHEDULER_DEFAULT:
             from . import operator
-            operator.start()
+            # operator.start()

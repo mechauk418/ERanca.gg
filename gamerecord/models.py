@@ -58,11 +58,16 @@ class Record(models.Model):
     grade = models.CharField(max_length=80, blank=True)
     rp = models.CharField(max_length=80, blank=True)
     
+    #탈출여부, 1은 실패(전투 이외 요소), 2는 실패(전투패배), 3은 성공
+    escapeState = models.IntegerField(default=0, blank=True, null=True)
 
+    tacticalSkillGroup = models.CharField(max_length=80,blank=True)
+    tacticalSkillLevel = models.IntegerField(default=0, blank=True, null=True)
+    bestWeapon = models.CharField(max_length=80,blank=True)
 
 # skillOrderInfo = 스킬 레벨업 순서
 
-# escapeState = 1이면 탈출 실패, 2이면 전투 패배, 3이면 탈출
+# escapeSt-ate = 1이면 탈출 실패, 2이면 전투 패배, 3이면 탈출
 
 # tacticalSkillGroup = 최종 전술 스킬 종류
 

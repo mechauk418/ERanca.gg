@@ -36,6 +36,25 @@ gradevalue = {
     3:'1',
 }
 
+tacticalskill = {
+    30:'블링크',
+    40:'퀘이크',
+    50:'프로토콜 위반',
+    60:'붉은 폭풍',
+    70:'초월',
+    80:'아티팩트',
+    90:'무효화',
+    110:'강한 결속',
+    120:'블래스터 탄환',
+    130:'진실의 칼날',
+    140:'거짓 서약',
+    150:'치유의 바람',
+}
+
+with open('C:/Users/LeeJinUk/Desktop/ERGG/gamerecord/gameinfo.json', 'r') as f:
+    weapon_data = json.load(f)
+
+json.dumps(weapon_data)
 
 def refreshuser(nickname):
     time.sleep(0.02)
@@ -123,7 +142,7 @@ def getusernum(nickname):
     # 가져온 전적을 등록하는 과정
     for game in matchdetail:
         t = game['startDtm']
-        print(t)
+        
         gametime = datetime(int(t[0:4]),int(t[5:7]),int(t[8:10]), int(t[11:13]), int(t[14:16]), int(t[17:19]))
         gametime_aware = timezone.make_aware(gametime)
         if len(Record.objects.filter(gamenumber = game['gameId'])):
@@ -173,7 +192,12 @@ def getusernum(nickname):
                     damageToMonster  = g['damageToMonster'],
                     premaid  = g['preMade'],
                     useWard  = g['addSurveillanceCamera']+g['addTelephotoCamera'],
+                    escapeState = g['escapeState'],
+                    tacticalSkillGroup = tacticalskill[g['tacticalSkillGroup']],
+                    tacticalSkillLevel = g['tacticalSkillLevel'],
+                    bestWeapon = weapon_data[str(g['bestWeapon'])]
                 )
+                
                 if '0' in g['equipment']:
                     userrecord.item0 = g['equipment']['0']
                     userrecord.item0_grade = Item.objects.get(itemnumber = userrecord.item0 ).grade
@@ -285,6 +309,10 @@ def getusernum(nickname):
                             damageToMonster  = g['damageToMonster'],
                             premaid  = g['preMade'],
                             useWard  = g['addSurveillanceCamera']+g['addTelephotoCamera'],
+                            escapeState = g['escapeState'],
+                            tacticalSkillGroup = tacticalskill[g['tacticalSkillGroup']],
+                            tacticalSkillLevel = g['tacticalSkillLevel'],
+                            bestWeapon = weapon_data[str(g['bestWeapon'])]
                         )
                         if '0' in g['equipment']:
                             userrecord.item0 = g['equipment']['0']
@@ -442,6 +470,10 @@ def refreshrecord(nickname):
                         damageToMonster  = g['damageToMonster'],
                         premaid  = g['preMade'],
                         useWard  = g['addSurveillanceCamera']+g['addTelephotoCamera'],
+                        escapeState = g['escapeState'],
+                        tacticalSkillGroup = tacticalskill[g['tacticalSkillGroup']],
+                        tacticalSkillLevel = g['tacticalSkillLevel'],
+                        bestWeapon = weapon_data[str(g['bestWeapon'])]
                     )
                     if '0' in g['equipment']:
                         userrecord.item0 = g['equipment']['0']
@@ -556,6 +588,10 @@ def refreshrecord(nickname):
                                 damageToMonster  = g['damageToMonster'],
                                 premaid  = g['preMade'],
                                 useWard  = g['addSurveillanceCamera']+g['addTelephotoCamera'],
+                                escapeState = g['escapeState'],
+                                tacticalSkillGroup = tacticalskill[g['tacticalSkillGroup']],
+                                tacticalSkillLevel = g['tacticalSkillLevel'],
+                                bestWeapon = weapon_data[str(g['bestWeapon'])]
                             )
                             if '0' in g['equipment']:
                                 userrecord.item0 = g['equipment']['0']
@@ -825,3 +861,32 @@ def rpeff():
             ch.save()
 
     return
+
+# MasteryType = {
+# "0": "없음",
+# "1": "글러브",
+# "2": "톤파",
+# "3": "방망이",
+# "4": "채찍",
+# "5": "투척",
+# "6": "암기",
+# "7": "활",
+# "8": "석궁",
+# "9": "권총",
+# "10": "돌격 소총",
+# "11": "저격총",
+# "12": "망치",
+# "14": "도끼",
+# "15": "단검",
+# "16": "양손검",
+# "17": "폴암",
+# "18": "쌍검",
+# "19": "창",
+# "20": "쌍절곤",
+# "21": "레이피어",
+# "22": "기타",
+# "23": "카메라",
+# "24": "아르카나",
+# "25": "VF의수"
+# }
+
