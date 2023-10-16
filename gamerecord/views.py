@@ -51,10 +51,10 @@ tacticalskill = {
     150:'치유의 바람',
 }
 
-with open('C:/Users/LeeJinUk/Desktop/ERGG/gamerecord/gameinfo.json', 'r') as f:
+with open('gamerecord\gameinfo.json', 'r') as f:
     weapon_data = json.load(f)
 
-json.dumps(weapon_data)
+print(weapon_data)
 
 def refreshuser(nickname):
     time.sleep(0.02)
