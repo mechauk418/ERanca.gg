@@ -51,7 +51,7 @@ tacticalskill = {
     150:'치유의 바람',
 }
 
-with open('gamerecord\gameinfo.json', 'r') as f:
+with open('gamerecord/gameinfo.json', 'r') as f:
     weapon_data = json.load(f)
 
 print(weapon_data)
