@@ -119,10 +119,7 @@ def getusernum(nickname):
         headers={'x-api-key':apikey}
     )
     userNum_json = userNum.json()
-    if userNum_json['code'] == 404:
-        return '유저가 없습니다.'
-    else:
-        userNum = userNum_json['user']['userNum']
+    userNum = userNum_json['user']['userNum']
     
     
     
@@ -689,9 +686,7 @@ class RecordView(ModelViewSet):
             new_user = Gameuser.objects.get(nickname=self.kwargs.get('nickname'))
             
         except:
-            search = getusernum(self.kwargs.get('nickname'))
-            if search == '유저가 없습니다.':
-                return '유저가 없습니다.'
+            getusernum(self.kwargs.get('nickname'))
 
         qs = Record.objects.filter(user=self.kwargs.get('nickname')).order_by('-gamenumber')
 
