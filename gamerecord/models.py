@@ -65,6 +65,13 @@ class Record(models.Model):
     tacticalSkillLevel = models.IntegerField(default=0, blank=True, null=True)
     bestWeapon = models.CharField(max_length=80,blank=True)
 
+    traitFirstCore = models.CharField(max_length=80,blank=True)
+    traitFirstSub1= models.IntegerField(default=0, blank=True, null=True)
+    traitFirstSub2= models.IntegerField(default=0, blank=True, null=True)
+    traitSecondSub1= models.IntegerField(default=0, blank=True, null=True)
+    traitSecondSub2= models.IntegerField(default=0, blank=True, null=True)
+
+
 # skillOrderInfo = 스킬 레벨업 순서
 
 # escapeSt-ate = 1이면 탈출 실패, 2이면 전투 패배, 3이면 탈출

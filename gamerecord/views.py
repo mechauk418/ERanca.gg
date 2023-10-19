@@ -79,6 +79,23 @@ weapon_data = {
 "25": "VF의수"
 }
 
+traitinfo = {
+   7000201 : "취약",
+   7000301 : "광분",
+   7000401 : "흡혈마",
+   7000501 : "벽력",
+   7000601 : "아드레날린",
+   7100101 : "금강",
+   7100201 : "불괴",
+   7100301 : "망각",
+   7100401 : "빛의 수호",
+   7100501 : "응징",
+   7200101 : "초재생",
+   7200301 : "치유 드론",
+   7200201 : "증폭 드론",
+   7200401 : "추진력",
+}
+
 
 def refreshuser(nickname):
     time.sleep(0.02)
@@ -219,7 +236,12 @@ def getusernum(nickname):
                     escapeState = g['escapeState'],
                     tacticalSkillGroup = tacticalskill[g['tacticalSkillGroup']],
                     tacticalSkillLevel = g['tacticalSkillLevel'],
-                    bestWeapon = weapon_data[str(g['bestWeapon'])]
+                    bestWeapon = weapon_data[str(g['bestWeapon'])],
+                    traitFirstCore = traitinfo[g['traitFirstCore']],
+                    traitFirstSub1 =g['traitFirstSub'][0],
+                    traitFirstSub2 =g['traitFirstSub'][1],
+                    traitSecondSub1 =g['traitSecondSub'][0],
+                    traitSecondSub2 =g['traitSecondSub'][1],
                 )
                 
                 if '0' in g['equipment']:
@@ -336,7 +358,12 @@ def getusernum(nickname):
                             escapeState = g['escapeState'],
                             tacticalSkillGroup = tacticalskill[g['tacticalSkillGroup']],
                             tacticalSkillLevel = g['tacticalSkillLevel'],
-                            bestWeapon = weapon_data[str(g['bestWeapon'])]
+                            bestWeapon = weapon_data[str(g['bestWeapon'])],
+                            traitFirstCore = traitinfo[g['traitFirstCore']],
+                            traitFirstSub1 =g['traitFirstSub'][0],
+                            traitFirstSub2 =g['traitFirstSub'][1],
+                            traitSecondSub1 =g['traitSecondSub'][0],
+                            traitSecondSub2 =g['traitSecondSub'][1],
                         )
                         if '0' in g['equipment']:
                             userrecord.item0 = g['equipment']['0']
@@ -453,18 +480,14 @@ def refreshrecord(nickname):
             break
 
         else:
-            time.sleep(0.02)
+            
             gamepost = requests.get(
                 f'https://open-api.bser.io/v1/games/{game["gameId"]}',
                 headers={'x-api-key':apikey}
             )
             gamepost = gamepost.json()
-            # if 'userGames' not in gamepost:
-            #                    gamepost = requests.get(
-            #     f'https://open-api.bser.io/v1/games/{game["gameId"]}',
-            #     headers={'x-api-key':apikey}
-            #     ).json()
-            
+            if 'userGames' not in gamepost:
+                print('request limit')
 
             for g in gamepost['userGames']:
                 
@@ -497,7 +520,12 @@ def refreshrecord(nickname):
                         escapeState = g['escapeState'],
                         tacticalSkillGroup = tacticalskill[g['tacticalSkillGroup']],
                         tacticalSkillLevel = g['tacticalSkillLevel'],
-                        bestWeapon = weapon_data[str(g['bestWeapon'])]
+                        bestWeapon = weapon_data[str(g['bestWeapon'])],
+                        traitFirstCore = traitinfo[g['traitFirstCore']],
+                        traitFirstSub1 =g['traitFirstSub'][0],
+                        traitFirstSub2 =g['traitFirstSub'][1],
+                        traitSecondSub1 =g['traitSecondSub'][0],
+                        traitSecondSub2 =g['traitSecondSub'][1],
                     )
                     if '0' in g['equipment']:
                         userrecord.item0 = g['equipment']['0']
@@ -537,9 +565,7 @@ def refreshrecord(nickname):
         next_number = match['next']
 
         while True:
-
             days_check = False
-            time.sleep(0.02)
             match = requests.get(
                 f'https://open-api.bser.io/v1/user/games/{userNum}?next={next_number}',
                 headers={'x-api-key':apikey})
@@ -560,7 +586,6 @@ def refreshrecord(nickname):
 
             # 가져온 전적을 등록하는 과정
             for game in matchdetail:
-                print(game['gameId'])
                 t = game['startDtm']
                 gametime = datetime(int(t[0:4]),int(t[5:7]),int(t[8:10]), int(t[11:13]), int(t[14:16]), int(t[17:19])  )
                 gametime_aware = timezone.make_aware(gametime)
@@ -574,12 +599,13 @@ def refreshrecord(nickname):
                     break
 
                 else:
-                    time.sleep(0.02)
                     gamepost = requests.get(
                         f'https://open-api.bser.io/v1/games/{game["gameId"]}',
                         headers={'x-api-key':apikey}
                     )
                     gamepost = gamepost.json()
+                    if 'userGames' not in gamepost:
+                        print('request limit')
                     # while 'userGames' not in gamepost:
                     #                            gamepost = requests.get(
                     #     f'https://open-api.bser.io/v1/games/{game["gameId"]}',
@@ -615,8 +641,12 @@ def refreshrecord(nickname):
                                 escapeState = g['escapeState'],
                                 tacticalSkillGroup = tacticalskill[g['tacticalSkillGroup']],
                                 tacticalSkillLevel = g['tacticalSkillLevel'],
-                                bestWeapon = weapon_data[str(g['bestWeapon'])]
-                            )
+                                bestWeapon = weapon_data[str(g['bestWeapon'])],
+                                traitFirstCore = traitinfo[g['traitFirstCore']],
+                                traitFirstSub1 =g['traitFirstSub'][0],
+                                traitFirstSub2 =g['traitFirstSub'][1],
+                                traitSecondSub1 =g['traitSecondSub'][0],
+                                traitSecondSub2 =g['traitSecondSub'][1],                            )
                             if '0' in g['equipment']:
                                 userrecord.item0 = g['equipment']['0']
                                 userrecord.item0_grade = Item.objects.get(itemnumber = userrecord.item0 ).grade
