@@ -926,6 +926,13 @@ from google.cloud import vision
 def detect_text(request):
     testdata = json.loads(request.body)
     path = testdata['imgurl'][22:]
+
+    top1000 = requests.get(
+    f'https://open-api.bser.io/v1/rank/top/19/3',
+    headers={'x-api-key':apikey}).json()['topRanks']
+
+    eternity = top1000[199]['mmr']
+    demigod = top1000[799]['mmr']
     
     client = vision.ImageAnnotatorClient()
     base64img = base64.b64decode(path)
@@ -977,10 +984,10 @@ def detect_text(request):
             temtdict['rp'] = userstats['mmr']%250
         else:
             temtdict['rp'] = userstats['mmr']-6000
-            if userstats['mmr'] >= 6400:
+            if userstats['mmr'] >= eternity:
                 temtdict['tier'] = '이터니티'
                 temtdict['grade']=''
-            elif userstats['mmr'] >= 6200:
+            elif userstats['mmr'] >= demigod:
                 temtdict['tier'] = '데미갓'
                 temtdict['grade']=''
             else:
