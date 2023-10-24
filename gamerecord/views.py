@@ -952,8 +952,8 @@ def detect_text(request):
         temt = text.description
         nicklist = temt.split('\n')
         break
-    
-    print(nicklist)
+
+
     multilist = {}
     for nickname in nicklist:
         userNum = requests.get(
@@ -961,6 +961,8 @@ def detect_text(request):
             headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
         )
         userNum_json = userNum.json()
+        if 'user' not in userNum_json:
+            return HttpResponse('error')
         userNum = userNum_json['user']['userNum']
         userstats = requests.get(
             f'https://open-api.bser.io/v1/user/stats/{userNum}/19',
