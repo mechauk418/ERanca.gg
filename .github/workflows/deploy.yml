@@ -49,12 +49,12 @@ jobs:
                   value: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                 - name: AWS_STORAGE_BUCKET_NAME
                   value: ${{ secrets.AWS_STORAGE_BUCKET_NAME }}
-                - name: create-json
-                  id: create-json
-                  uses: jsdaniell/create-json@1.1.2
-                  with:
-                    name: "vision.json"
-                    json: ${{ secrets.VISIONJSON }}
+                - name: GCP_CLIENT_ID
+                  value: ${{ secrets.GCP_CLIENT_ID }}
+                - name: GCP_PRIVATE_KEY
+                  value: ${{ secrets.GCP_PRIVATE_KEY }}
+                - name: GCP_PRIVATE_KEY_ID
+                  value: ${{ secrets.GCP_PRIVATE_KEY_ID }}
 
               ports: "8000"
               start: python3 manage.py runserver 0:8000 --noreload
