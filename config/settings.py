@@ -302,24 +302,5 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
 FILE_UPLOAD_MAX_MEMORY_SIZE = 15728640
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
-import json
-
-
-test_google = {
-  "type": "service_account",
-  "project_id": "erancaocr",
-  "private_key_id": os.getenv('GCP_PRIVATE_KEY_ID'),
-  "private_key": os.getenv('GCP_PRIVATE_KEY'),
-  "client_email": "mechauk@erancaocr.iam.gserviceaccount.com",
-  "client_id": os.getenv('GCP_CLIENT_ID'),
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/mechauk%40erancaocr.iam.gserviceaccount.com",
-  "universe_domain": "googleapis.com"
-}
-
-test_google_json = json.dumps(test_google)
-
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = test_google_json
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'erancaocr-8b21159d976b.json'
 
