@@ -30,7 +30,7 @@ jobs:
                 - name: SECRET_KEY
                   value: ${{ secrets.SECRET_KEY }}
                 - name: DEBUG
-                  value: True
+                  value: ${{ secrets.DEBUG }}
                 - name: X_API_KEY
                   value: ${{ secrets.X_API_KEY }}
                 - name: CLOUDTYPE_TOKEN
@@ -49,6 +49,13 @@ jobs:
                   value: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                 - name: AWS_STORAGE_BUCKET_NAME
                   value: ${{ secrets.AWS_STORAGE_BUCKET_NAME }}
+                - name: create-json
+                  id: create-json
+                  uses: jsdaniell/create-json@1.1.2
+                  with:
+                    name: "vision.json"
+                    json: ${{ secrets.VISIONJSON }}
+
               ports: "8000"
               start: python3 manage.py runserver 0:8000 --noreload
               prestart: python3 manage.py makemigrations && python3 manage.py migrate &&

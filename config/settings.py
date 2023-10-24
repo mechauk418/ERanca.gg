@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = os.getenv("SECRET_KEY")
-SECRET_KEY = 'django-insecure-di_d=ja1$s$4ud@6kl(8+wzaauzq!i_tv7%07jn+(cc_r*c!g7'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -290,3 +290,16 @@ APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
 APSCHEDULER_RUN_NOW_TIMEOUT = 9999999  # Seconds
 
 SCHEDULER_DEFAULT = True # apps.py 참고
+
+FILE_UPLOAD_HANDLERS = [
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+]
+
+
+MAX_UPLOAD_SIZE = 15728640
+DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
+FILE_UPLOAD_MAX_MEMORY_SIZE = 15728640
+DATA_UPLOAD_MAX_NUMBER_FIELDS = None
+
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.getenv("VISIONJSON")

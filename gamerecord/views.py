@@ -953,6 +953,7 @@ def detect_text(request):
         nicklist = temt.split('\n')
         break
     
+    print(nicklist)
     multilist = {}
     for nickname in nicklist:
         userNum = requests.get(
@@ -993,11 +994,11 @@ def detect_text(request):
         temtdict['averageKills']=userstats['averageKills']
 
 
-        temtdict['most1']= Character.objects.get(id=[userstats['characterStats'][0]['characterCode']]).name
+        temtdict['most1']= Character.objects.get(id=userstats['characterStats'][0]['characterCode']).name
         temtdict['most1_play'] = round((userstats['characterStats'][0]['totalGames']*100)/userstats['totalGames'],1)
-        temtdict['most2']=Character.objects.get(id=[userstats['characterStats'][1]['characterCode']]).name
+        temtdict['most2']=Character.objects.get(id=userstats['characterStats'][1]['characterCode']).name
         temtdict['most2_play'] = round((userstats['characterStats'][1]['totalGames']*100)/userstats['totalGames'],1)
-        temtdict['most3']=Character.objects.get(id=[userstats['characterStats'][2]['characterCode']]).name
+        temtdict['most3']=Character.objects.get(id=userstats['characterStats'][2]['characterCode']).name
         temtdict['most3_play'] = round((userstats['characterStats'][2]['totalGames']*100)/userstats['totalGames'],1)
 
         multilist[nickname]=temtdict
