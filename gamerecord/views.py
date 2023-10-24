@@ -917,6 +917,90 @@ def rpeff():
 
     return
 
+import io, json, base64
+from django.views.decorators.csrf import csrf_exempt
+from PIL import Image
+from google.cloud import vision
+
+@csrf_exempt
+def detect_text(request):
+    testdata = json.loads(request.body)
+    path = testdata['imgurl'][22:]
+    
+    client = vision.ImageAnnotatorClient()
+    base64img = base64.b64decode(path)
+    img = Image.open(io.BytesIO(base64img))
+    img_h,img_w = img.size
+    crop1=(2200/3840)*img_h
+    crop2=(3600/3840)*img_h
+    crop3=(1850/2160)*img_w
+    crop4=(1950/2160)*img_w
+
+    img_crop = img.crop((crop1,crop3,crop2,crop4))
+
+    buffer = io.BytesIO()
+    img_crop.save(buffer,format='PNG')
+    img_data = buffer.getvalue()
+    
+    image = vision.Image(content=img_data)
+
+    response = client.text_detection(image=image)
+    texts = response.text_annotations
+    
+    nicklist=[]
+    for text in texts:
+        temt = text.description
+        nicklist = temt.split('\n')
+        break
+    
+    multilist = {}
+    for nickname in nicklist:
+        userNum = requests.get(
+            f'https://open-api.bser.io/v1/user/nickname?query={nickname}',
+            headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
+        )
+        userNum_json = userNum.json()
+        userNum = userNum_json['user']['userNum']
+        userstats = requests.get(
+            f'https://open-api.bser.io/v1/user/stats/{userNum}/19',
+            headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
+        ).json()['userStats'][0]
+        print(userstats)
+        temtdict = {}
+
+        if userstats['mmr'] < 6000:
+            temtdict['tier'] = tiervalue[userstats['mmr']//1000]
+            temtdict['grade'] = gradevalue[(userstats['mmr']%1000)//250]
+            temtdict['rp'] = userstats['mmr']%250
+        else:
+            temtdict['rp'] = userstats['mmr']-6000
+            if userstats['mmr'] >= 6400:
+                temtdict['tier'] = '이터니티'
+                temtdict['grade']=''
+            elif userstats['mmr'] >= 6200:
+                temtdict['tier'] = '데미갓'
+                temtdict['grade']=''
+            else:
+                temtdict['tier'] = '미스릴'
+                temtdict['grade']=''
 
 
-#debug
+
+        temtdict['nickname']=userstats['nickname']
+        temtdict['totalGames']=userstats['totalGames']
+        temtdict['totalWins']=userstats['totalWins']
+        temtdict['winrate']=round((userstats['totalWins']*100)/userstats['totalGames'],1)
+        temtdict['averageKills']=userstats['averageKills']
+
+
+        temtdict['most1']= Character.objects.get(id=[userstats['characterStats'][0]['characterCode']]).name
+        temtdict['most1_play'] = round((userstats['characterStats'][0]['totalGames']*100)/userstats['totalGames'],1)
+        temtdict['most2']=Character.objects.get(id=[userstats['characterStats'][1]['characterCode']]).name
+        temtdict['most2_play'] = round((userstats['characterStats'][1]['totalGames']*100)/userstats['totalGames'],1)
+        temtdict['most3']=Character.objects.get(id=[userstats['characterStats'][2]['characterCode']]).name
+        temtdict['most3_play'] = round((userstats['characterStats'][2]['totalGames']*100)/userstats['totalGames'],1)
+
+        multilist[nickname]=temtdict
+
+    return JsonResponse(multilist)
+
