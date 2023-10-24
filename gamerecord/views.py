@@ -938,6 +938,9 @@ def detect_text(request):
     base64img = base64.b64decode(path)
     img = Image.open(io.BytesIO(base64img))
     img_h,img_w = img.size
+    print((img_h/img_w))
+    if (img_h/img_w) > 0.57 or  (img_h/img_w) < 0.56:
+        return HttpResponse('error')
     crop1=(2200/3840)*img_h
     crop2=(3600/3840)*img_h
     crop3=(1850/2160)*img_w
@@ -955,12 +958,14 @@ def detect_text(request):
     texts = response.text_annotations
     
     nicklist=[]
+    
+
     for text in texts:
         temt = text.description
         nicklist = temt.split('\n')
         break
-
-
+    
+    print(nicklist)
     multilist = {}
     for nickname in nicklist:
         userNum = requests.get(
@@ -969,7 +974,8 @@ def detect_text(request):
         )
         userNum_json = userNum.json()
         if 'user' not in userNum_json:
-            return HttpResponse('error')
+            continue
+
         userNum = userNum_json['user']['userNum']
         userstats = requests.get(
             f'https://open-api.bser.io/v1/user/stats/{userNum}/19',
