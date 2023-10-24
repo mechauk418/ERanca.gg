@@ -939,7 +939,7 @@ def detect_text(request):
     img = Image.open(io.BytesIO(base64img))
     img_h,img_w = img.size
     print((img_h/img_w))
-    if (img_h/img_w) > 0.57 or  (img_h/img_w) < 0.56:
+    if (img_w/img_h) > 0.57 or  (img_w/img_h) < 0.56:
         return HttpResponse('error')
     crop1=(2200/3840)*img_h
     crop2=(3600/3840)*img_h
