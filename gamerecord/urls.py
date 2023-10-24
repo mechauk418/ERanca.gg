@@ -13,4 +13,6 @@ urlpatterns = [
     path("recentgainrp/<str:nickname>/", recentgainrp),
     path("testrp/<str:nickname>/", testrp),
     path("userch/<str:nickname>/", UseChView.as_view({'get':'retrieve'})),
+    path("crop/", detect_text),
+
 ]
