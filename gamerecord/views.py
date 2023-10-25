@@ -963,7 +963,7 @@ def detect_text(request):
     for nickname in nicklist:
         userNum = requests.get(
             f'https://open-api.bser.io/v1/user/nickname?query={nickname}',
-            headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
+            headers={'x-api-key':apikey}
         )
         userNum_json = userNum.json()
         if 'user' not in userNum_json:
@@ -972,7 +972,7 @@ def detect_text(request):
         userNum = userNum_json['user']['userNum']
         userstats = requests.get(
             f'https://open-api.bser.io/v1/user/stats/{userNum}/19',
-            headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
+            headers={'x-api-key':apikey}
         ).json()['userStats'][0]
         logger.info('검색된 유저 mmr')
         logger.info(userstats['mmr'])
