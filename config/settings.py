@@ -129,6 +129,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = 'staticfiles'
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
 
 # Default primary key field type
@@ -222,7 +223,7 @@ SESSION_COOKIE_SECURE=False
 
 
 # MEDIA_URL = '/media/'
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 if os.getenv("DEBUG") == 'True':
     DEBUG = True
@@ -284,6 +285,7 @@ else:
     MEDIA_URL = "http://%s/media/" % AWS_S3_CUSTOM_DOMAIN
     STATIC_URL = "http://%s/static/" % AWS_S3_CUSTOM_DOMAIN
     STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    
 
 APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
 
