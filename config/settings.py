@@ -304,3 +304,27 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'erancaocr-8b21159d976b.json'
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "file": {
+            "level": "DEBUG",
+            "encoding": "utf-8",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / 'logs.log',
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["file"],
+            "level": "ERROR",
+            "propagate": True,
+        },
+        "gamerecord": {
+            "handlers": ["file"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+    },
+}

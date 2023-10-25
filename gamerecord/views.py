@@ -2,20 +2,17 @@ from django.shortcuts import render, get_list_or_404
 from .models import *
 from .serializers import *
 from rest_framework.viewsets import ModelViewSet
-# Create your views here.
-import requests
 from django.http import JsonResponse, HttpResponse
-import time
 from rest_framework.response import Response
 from datetime import datetime, timedelta, date
 from rest_framework.pagination import PageNumberPagination
 from collections import defaultdict
 from character.models import Character, Item
 from django.utils import timezone
-import json
+import json, os, time, requests, logging
 from django_filters.rest_framework import DjangoFilterBackend
-import os
 
+logger = logging.getLogger('gamerecord')
 
 apikey = os.getenv("X_API_KEY")
 
@@ -130,7 +127,6 @@ def getusernum(nickname):
     sttime = time.time()
     now_time = timezone.localtime(timezone.now())
     # 유저 닉네임으로 유저 정보 받아옴
-    
     time.sleep(0.02)
     userNum = requests.get(
         f'https://open-api.bser.io/v1/user/nickname?query={nickname}',
@@ -472,7 +468,6 @@ def refreshrecord(nickname):
         t = game['startDtm']
         gametime = datetime(int(t[0:4]),int(t[5:7]),int(t[8:10]), int(t[11:13]), int(t[14:16]), int(t[17:19]))
         gametime_aware = timezone.make_aware(gametime)
-        print(game['gameId'])
         if game['matchingMode'] !=3:
 
             continue
@@ -695,13 +690,6 @@ def refreshrecord(nickname):
 
 
 
-
-def getuserRecord(request):
-
-    
-
-    return
-
 class RecordPage(PageNumberPagination):
     page_size = 10
 
@@ -712,11 +700,14 @@ class RecordView(ModelViewSet):
     queryset = Record.objects.all()
 
     def get_queryset(self, *args,**kwargs):
+        logger.info('전적검색')
+        logger.info(self.kwargs.get('nickname'))
 
         try:
             new_user = Gameuser.objects.get(nickname=self.kwargs.get('nickname'))
             
         except:
+            
             getusernum(self.kwargs.get('nickname'))
 
         qs = Record.objects.filter(user=self.kwargs.get('nickname')).order_by('-gamenumber')
@@ -741,9 +732,9 @@ class UseChView(ModelViewSet):
     serializer_class = UserUseSerializer
     lookup_field = 'nickname'
 
-
+# 최근 획득 RP View
 def recentgainrp(request,nickname):
-    
+
     alldict = dict()
     
     ch_dict = defaultdict(int)
@@ -774,12 +765,13 @@ def recentgainrp(request,nickname):
     return JsonResponse(alldict)
 
 
-def testrp(request,nickname):
+def refresh(request,nickname):
 
     return refreshrecord(nickname)
 
+# RP 통계 초기화
 def resetrp():
-    print('resetrp')
+    logger.info('resetrp')
 
     allcharacter = Character.objects.all()
 
@@ -791,8 +783,9 @@ def resetrp():
 
     return
 
+# RP 통계 데이터 수집
 def gainrp(start,end):
-    print('gainrp',start,end)
+    logger.info('gainrp   '+str(start)  + str(end))
     sttime = time.time()
     alldict = dict()
     mmrdict=defaultdict(int)
@@ -803,7 +796,6 @@ def gainrp(start,end):
     headers={'x-api-key':apikey}).json()['topRanks'][start:end]
 
     for user in top1000:
-        print(user['nickname'],user['rank'])
         userNum = user['userNum']
         time.sleep(0.02)
         match = requests.get(
@@ -879,7 +871,7 @@ def gainrp(start,end):
                     else:
                         break
 
-    print('탐색종료')
+    logger.info('탐색종료')
     ch2_item = list(trydict.items())
     ch2_item.sort(key=lambda x:(-x[1]))
 
@@ -899,14 +891,14 @@ def gainrp(start,end):
         ch.rpfor7days += i['mmrGain']
         ch.trygame7days += i['trygame']
         ch.save()
-        print(ch)
     
-    print('등록종료')
+    logger.info('등록종료')
 
     return
 
+# RP통계 데이터 작성
 def rpeff():
-    print('rpeff')
+    logger.info('rpeff')
 
     allcharacter = Character.objects.all()
 
@@ -938,7 +930,6 @@ def detect_text(request):
     base64img = base64.b64decode(path)
     img = Image.open(io.BytesIO(base64img))
     img_h,img_w = img.size
-    print((img_h/img_w))
     if (img_w/img_h) > 0.57 or  (img_w/img_h) < 0.56:
         return HttpResponse('error')
     crop1=(2200/3840)*img_h
@@ -964,8 +955,10 @@ def detect_text(request):
         temt = text.description
         nicklist = temt.split('\n')
         break
-    
-    print(nicklist)
+
+    logger.info('이미지 전적 검색')
+    logger.info(nicklist)
+
     multilist = {}
     for nickname in nicklist:
         userNum = requests.get(
@@ -981,7 +974,8 @@ def detect_text(request):
             f'https://open-api.bser.io/v1/user/stats/{userNum}/19',
             headers={'x-api-key':'alo3AXT2HC1SEa9MaVKOc10lHQ8LvYHr2SKf8zGU'}
         ).json()['userStats'][0]
-        print(userstats)
+        logger.info('검색된 유저 mmr')
+        logger.info(userstats['mmr'])
         temtdict = {}
 
         if userstats['mmr'] < 6000:
