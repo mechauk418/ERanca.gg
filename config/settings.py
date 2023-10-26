@@ -228,6 +228,9 @@ if os.getenv("DEBUG") == 'True':
 else:
     DEBUG = False
 
+STATICFILES_LOCATION = 'static'
+MEDIAFILES_LOCATION = 'media'
+
 if DEBUG: 
 
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
