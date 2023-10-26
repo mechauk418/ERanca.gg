@@ -82,3 +82,10 @@ class Record(models.Model):
 # tacticalSkillGroup = 최종 전술 스킬 종류
 
 # tacticalSkillLevel = 최종 전술 스킬 레벨
+
+
+class Logs(models.Model):
+
+    whatuse = models.CharField(max_length=80, blank=True)
+    nick1 = models.CharField(max_length=80, blank=True)
+    use_at = models.DateTimeField(auto_now_add=True)

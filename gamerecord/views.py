@@ -702,6 +702,10 @@ class RecordView(ModelViewSet):
     def get_queryset(self, *args,**kwargs):
         logger.info('전적검색')
         logger.info(self.kwargs.get('nickname'))
+        Logs.objects.create(
+            whatuse = '전적검색',
+            nick1 = self.kwargs.get('nickname')
+        )
 
         try:
             new_user = Gameuser.objects.get(nickname=self.kwargs.get('nickname'))
@@ -958,6 +962,11 @@ def detect_text(request):
 
     logger.info('이미지 전적 검색')
     logger.info(nicklist)
+
+    Logs.objects.create(
+            whatuse = '이미지검색',
+            nick1 = temt,
+        )
 
     multilist = {}
     for nickname in nicklist:
