@@ -37,5 +37,5 @@ class Comment(models.Model):
 
 class PostImage(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='image')
-    image = ResizedImageField(size=[1000,1000],upload_to="image", null=True, blank=True)
-    image_original = models.ImageField(upload_to="image", null=True, blank=True)
+    image = ResizedImageField(size=[1000,1000], null=True, blank=True)
+    image_original = models.ImageField(null=True, blank=True)
