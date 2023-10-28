@@ -6,6 +6,6 @@ class GamerecordConfig(AppConfig):
     name = 'gamerecord'
 
     def ready(self):
-        if settings.SCHEDULER_DEFAULT:
+        # if settings.SCHEDULER_DEFAULT:
             # from . import operator
             # operator.start()
