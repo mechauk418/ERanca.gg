@@ -108,7 +108,7 @@ def refreshuser(nickname):
     # 유저 닉네임으로 유저 정보 받아옴
     time.sleep(0.02)
     userstats = requests.get(
-        f'https://open-api.bser.io/v1/user/stats/{userNum}/19',
+        f'https://open-api.bser.io/v1/user/stats/{userNum}/20',
         headers={'x-api-key':apikey}
     ).json()['userStats'][0]
 
@@ -139,17 +139,22 @@ def getusernum(nickname):
     
     # 이터니티, 데미갓 티어 커트라인 점수를 구함
     top1000 = requests.get(
-    f'https://open-api.bser.io/v1/rank/top/19/3',
-    headers={'x-api-key':apikey}).json()['topRanks']
+    f'https://open-api.bser.io/v1/rank/top/20/3',
+    headers={'x-api-key':apikey}).json()
 
-    eternity = top1000[199]['mmr']
-    demigod = top1000[799]['mmr']
+    if top1000['code']==404:
+        eternity = 6200
+        demigod = 6200
+    else:
+
+        eternity = top1000['topRanks'][199]['mmr']
+        demigod = top1000['topRanks'][799]['mmr']
     
 
     # 유저의 이번 시즌 정보를 받아옴, 19는 정규시즌1 번호
     time.sleep(0.02)
     userstats = requests.get(
-        f'https://open-api.bser.io/v1/user/stats/{userNum}/19',
+        f'https://open-api.bser.io/v1/user/stats/{userNum}/20',
         headers={'x-api-key':apikey}
     ).json()['userStats'][0]
 
@@ -424,7 +429,7 @@ def refreshrecord(nickname):
     userNum = userNum_json['user']['userNum']
     
     top1000 = requests.get(
-    f'https://open-api.bser.io/v1/rank/top/19/3',
+    f'https://open-api.bser.io/v1/rank/top/20/3',
     headers={'x-api-key':apikey}).json()['topRanks']
 
     eternity = top1000[199]['mmr']
@@ -435,7 +440,7 @@ def refreshrecord(nickname):
     # 유저의 이번 시즌 정보를 받아옴, 19는 정규시즌1 번호
     time.sleep(0.02)
     userstats = requests.get(
-        f'https://open-api.bser.io/v1/user/stats/{userNum}/19',
+        f'https://open-api.bser.io/v1/user/stats/{userNum}/20',
         headers={'x-api-key':apikey}
     ).json()['userStats'][0]
 
@@ -796,7 +801,7 @@ def gainrp(start,end):
     trydict = defaultdict(int)
 
     top1000 = requests.get(
-    f'https://open-api.bser.io/v1/rank/top/19/3',
+    f'https://open-api.bser.io/v1/rank/top/20/3',
     headers={'x-api-key':apikey}).json()['topRanks'][start:end]
 
     for user in top1000:
@@ -924,7 +929,7 @@ def detect_text(request):
     path = testdata['imgurl'][22:]
 
     top1000 = requests.get(
-    f'https://open-api.bser.io/v1/rank/top/19/3',
+    f'https://open-api.bser.io/v1/rank/top/20/3',
     headers={'x-api-key':apikey}).json()['topRanks']
 
     eternity = top1000[199]['mmr']
@@ -980,7 +985,7 @@ def detect_text(request):
 
         userNum = userNum_json['user']['userNum']
         userstats = requests.get(
-            f'https://open-api.bser.io/v1/user/stats/{userNum}/19',
+            f'https://open-api.bser.io/v1/user/stats/{userNum}/20',
             headers={'x-api-key':apikey}
         ).json()['userStats'][0]
         logger.info('검색된 유저 mmr')
