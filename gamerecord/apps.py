@@ -5,7 +5,7 @@ class GamerecordConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'gamerecord'
 
-    def ready(self):
+    # def ready(self):
         # if settings.SCHEDULER_DEFAULT:
             # from . import operator
             # operator.start()

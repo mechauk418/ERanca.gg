@@ -71,6 +71,9 @@ class Record(models.Model):
     traitSecondSub1= models.IntegerField(default=0, blank=True, null=True)
     traitSecondSub2= models.IntegerField(default=0, blank=True, null=True)
 
+    season = models.IntegerField(default=0, blank=True, null=True)
+    matchingMode = models.IntegerField(default=3, blank=True, null=True)
+
     def __str__(self) -> str:
         return self.user + '(' + str(self.gamenumber) + ')'
 

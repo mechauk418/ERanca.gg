@@ -16,6 +16,8 @@ logger = logging.getLogger('gamerecord')
 
 apikey = os.getenv("X_API_KEY")
 
+seasonid = 20 # 정규 시즌2
+
 # 티어, 등급 딕셔너리
 tiervalue = {
     0:"아이언",
@@ -108,7 +110,7 @@ def refreshuser(nickname):
     # 유저 닉네임으로 유저 정보 받아옴
     time.sleep(0.02)
     userstats = requests.get(
-        f'https://open-api.bser.io/v1/user/stats/{userNum}/20',
+        f'https://open-api.bser.io/v1/user/stats/{userNum}/{seasonid}',
         headers={'x-api-key':apikey}
     ).json()['userStats'][0]
 
@@ -139,7 +141,7 @@ def getusernum(nickname):
     
     # 이터니티, 데미갓 티어 커트라인 점수를 구함
     top1000 = requests.get(
-    f'https://open-api.bser.io/v1/rank/top/20/3',
+    f'https://open-api.bser.io/v1/rank/top/{seasonid}/3',
     headers={'x-api-key':apikey}).json()
 
     if top1000['code']==404:
@@ -154,7 +156,7 @@ def getusernum(nickname):
     # 유저의 이번 시즌 정보를 받아옴, 19는 정규시즌1 번호
     time.sleep(0.02)
     userstats = requests.get(
-        f'https://open-api.bser.io/v1/user/stats/{userNum}/20',
+        f'https://open-api.bser.io/v1/user/stats/{userNum}/{seasonid}',
         headers={'x-api-key':apikey}
     ).json()['userStats'][0]
 
@@ -244,6 +246,8 @@ def getusernum(nickname):
                     traitFirstSub2 =g['traitFirstSub'][1],
                     traitSecondSub1 =g['traitSecondSub'][0],
                     traitSecondSub2 =g['traitSecondSub'][1],
+                    matchingMode = g['matchingMode'],
+                    season = g['seasonId']
                 )
                 
                 if '0' in g['equipment']:
@@ -366,6 +370,8 @@ def getusernum(nickname):
                             traitFirstSub2 =g['traitFirstSub'][1],
                             traitSecondSub1 =g['traitSecondSub'][0],
                             traitSecondSub2 =g['traitSecondSub'][1],
+                            matchingMode = g['matchingMode'],
+                            season = g['seasonId']
                         )
                         if '0' in g['equipment']:
                             userrecord.item0 = g['equipment']['0']
@@ -429,7 +435,7 @@ def refreshrecord(nickname):
     userNum = userNum_json['user']['userNum']
     
     top1000 = requests.get(
-    f'https://open-api.bser.io/v1/rank/top/20/3',
+    f'https://open-api.bser.io/v1/rank/top/{seasonid}/3',
     headers={'x-api-key':apikey}).json()['topRanks']
 
     eternity = top1000[199]['mmr']
@@ -440,7 +446,7 @@ def refreshrecord(nickname):
     # 유저의 이번 시즌 정보를 받아옴, 19는 정규시즌1 번호
     time.sleep(0.02)
     userstats = requests.get(
-        f'https://open-api.bser.io/v1/user/stats/{userNum}/20',
+        f'https://open-api.bser.io/v1/user/stats/{userNum}/{seasonid}',
         headers={'x-api-key':apikey}
     ).json()['userStats'][0]
 
@@ -527,6 +533,8 @@ def refreshrecord(nickname):
                         traitFirstSub2 =g['traitFirstSub'][1],
                         traitSecondSub1 =g['traitSecondSub'][0],
                         traitSecondSub2 =g['traitSecondSub'][1],
+                        matchingMode = g['matchingMode'],
+                        season = g['seasonId']
                     )
                     if '0' in g['equipment']:
                         userrecord.item0 = g['equipment']['0']
@@ -647,7 +655,10 @@ def refreshrecord(nickname):
                                 traitFirstSub1 =g['traitFirstSub'][0],
                                 traitFirstSub2 =g['traitFirstSub'][1],
                                 traitSecondSub1 =g['traitSecondSub'][0],
-                                traitSecondSub2 =g['traitSecondSub'][1],                            )
+                                traitSecondSub2 =g['traitSecondSub'][1],
+                                matchingMode = g['matchingMode'],
+                                season = g['seasonId']
+                                )
                             if '0' in g['equipment']:
                                 userrecord.item0 = g['equipment']['0']
                                 userrecord.item0_grade = Item.objects.get(itemnumber = userrecord.item0 ).grade
@@ -801,7 +812,7 @@ def gainrp(start,end):
     trydict = defaultdict(int)
 
     top1000 = requests.get(
-    f'https://open-api.bser.io/v1/rank/top/20/3',
+    f'https://open-api.bser.io/v1/rank/top/{seasonid}/3',
     headers={'x-api-key':apikey}).json()['topRanks'][start:end]
 
     for user in top1000:
@@ -929,7 +940,7 @@ def detect_text(request):
     path = testdata['imgurl'][22:]
 
     top1000 = requests.get(
-    f'https://open-api.bser.io/v1/rank/top/20/3',
+    f'https://open-api.bser.io/v1/rank/top/{seasonid}/3',
     headers={'x-api-key':apikey}).json()['topRanks']
 
     eternity = top1000[199]['mmr']
@@ -985,7 +996,7 @@ def detect_text(request):
 
         userNum = userNum_json['user']['userNum']
         userstats = requests.get(
-            f'https://open-api.bser.io/v1/user/stats/{userNum}/20',
+            f'https://open-api.bser.io/v1/user/stats/{userNum}/{seasonid}',
             headers={'x-api-key':apikey}
         ).json()['userStats'][0]
         logger.info('검색된 유저 mmr')
