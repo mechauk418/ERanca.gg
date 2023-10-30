@@ -74,6 +74,7 @@ class Record(models.Model):
 
     season = models.IntegerField(default=0, blank=True, null=True)
     matchingMode = models.IntegerField(default=3, blank=True, null=True)
+    versionMajor = models.IntegerField(default=6, blank=True, null=True)
 
     def __str__(self) -> str:
         return self.user + '(' + str(self.gamenumber) + ')'

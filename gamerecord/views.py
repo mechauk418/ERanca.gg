@@ -894,15 +894,24 @@ class UseChView(ModelViewSet):
     serializer_class = UserUseSerializer
     lookup_field = 'nickname'
 
+    def retrieve(self, request, *args, **wargs):
+        qureyset = Gameuser.objects.all()
+        user = get_object_or_404(qureyset, nickname=self.kwargs.get('nickname'), season = self.kwargs.get('season'))
+        serializer = UserUseSerializer(user)
+
+        return Response(serializer.data)
+
+
+
 # 최근 획득 RP View
-def recentgainrp(request,nickname):
+def recentgainrp(request,nickname,season):
 
     alldict = dict()
     
     ch_dict = defaultdict(int)
     ch2_dict = defaultdict(int)
 
-    userid = Gameuser.objects.get(nickname = nickname)
+    userid = Gameuser.objects.get(nickname = nickname, season=season)
     userrecord = Record.objects.filter(user = userid, startDtm__range=[date.today()-timedelta(days=14),date.today()])
 
     for g in userrecord:

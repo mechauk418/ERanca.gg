@@ -138,28 +138,42 @@ class RecordSerializer(serializers.ModelSerializer):
         model = Record
         fields = '__all__'
 
-
+# 유저가 사용한 캐릭터 목록
 class UserUseSerializer(serializers.ModelSerializer):
 
-    usech = serializers.SerializerMethodField()
+    usechrank = serializers.SerializerMethodField()
+    usechnormal = serializers.SerializerMethodField()
 
-    def get_usech(self,obj):
-        userlist = []
+    def get_usechrank(self,obj):
+        useruselist = []
         checklist = [] # 중복 체크
-        qs = Record.objects.filter(user = obj.nickname).order_by('character')
+        qs = Record.objects.filter(user = obj.nickname, season=obj.season, matchingMode=3).order_by('character')
         for i in qs:
             temt = Character.objects.get(id=i.character)
             if temt.pk not in checklist:
                 checklist.append(temt.pk)
-                userlist.append( {'chname': temt.koreanname, 'chnumber':temt.pk} )
+                useruselist.append( {'chname': temt.koreanname, 'chnumber':temt.pk} )
 
             else:
                 continue
 
-                
+        return useruselist
+    
+    def get_usechnormal(self,obj):
+        useruselist = []
+        checklist = [] # 중복 체크
+        qs = Record.objects.filter(user = obj.nickname, season=obj.season, matchingMode=2).order_by('character')
+        for i in qs:
+            temt = Character.objects.get(id=i.character)
+            if temt.pk not in checklist:
+                checklist.append(temt.pk)
+                useruselist.append( {'chname': temt.koreanname, 'chnumber':temt.pk} )
 
-        return userlist
+            else:
+                continue
+
+        return useruselist
 
     class Meta:
         model = Gameuser
-        fields = ['usech']
+        fields = ['usechrank', 'usechnormal']
