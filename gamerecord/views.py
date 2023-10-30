@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_list_or_404
+from django.shortcuts import render, get_list_or_404, get_object_or_404
 from .models import *
 from .serializers import *
 from rest_framework.viewsets import ModelViewSet
@@ -16,7 +16,8 @@ logger = logging.getLogger('gamerecord')
 
 apikey = os.getenv("X_API_KEY")
 
-seasonid = 20 # 정규 시즌2
+seasonid = 20 # 정규 프리 시즌2
+versionMajor = 7 # 메이저버전 
 
 # 티어, 등급 딕셔너리
 tiervalue = {
@@ -44,7 +45,7 @@ tacticalskill = {
     80:'아티팩트',
     90:'무효화',
     110:'강한 결속',
-    120:'블래스터 탄환',
+    120:'스트라이더 - A13',
     130:'진실의 칼날',
     140:'거짓 서약',
     150:'치유의 바람',
@@ -114,7 +115,7 @@ def refreshuser(nickname):
         headers={'x-api-key':apikey}
     ).json()['userStats'][0]
 
-    user = Gameuser.objects.get(userNum = userstats['userNum'])
+    user = Gameuser.objects.get(userNum = userstats['userNum'], season=seasonid)
     user.mmr = userstats['mmr']
     user.rank = userstats['rank']
     user.totalGames = userstats['totalGames']
@@ -161,7 +162,7 @@ def getusernum(nickname):
     ).json()['userStats'][0]
 
     # 처음 검색해서 DB에 유저가 없음
-    if not Gameuser.objects.filter(nickname = userstats['nickname']):
+    if not Gameuser.objects.filter(nickname = userstats['nickname'], season = seasonid):
         Gameuser.objects.create(
             userNum = userstats['userNum'],
             mmr = userstats['mmr'],
@@ -170,11 +171,12 @@ def getusernum(nickname):
             totalGames = userstats['totalGames'],
             winrate = round((userstats['totalWins']*100 / userstats['totalGames']),1),
             averageKills = userstats['averageKills'],
+            season = userstats['seasonId']
         )
     
     refreshuser(nickname)
 
-    search_user = Gameuser.objects.get(nickname = nickname)
+    search_user = Gameuser.objects.get(nickname = nickname, season = seasonid)
 
     # 유저 넘버로 유저의 최근 90일 내의 전적을 모두 가져옴
     time.sleep(0.02)
@@ -190,17 +192,11 @@ def getusernum(nickname):
         
         gametime = datetime(int(t[0:4]),int(t[5:7]),int(t[8:10]), int(t[11:13]), int(t[14:16]), int(t[17:19]))
         gametime_aware = timezone.make_aware(gametime)
+
         if len(Record.objects.filter(gamenumber = game['gameId'])):
-        
             continue
-
-        elif game['matchingMode'] !=3:
-
-            continue
-
-        elif (now_time - gametime_aware).days >= 14:
+        elif (now_time - gametime_aware).days >= 30:
             break
-
         else:
             time.sleep(0.02)
             gamepost = requests.get(
@@ -214,42 +210,77 @@ def getusernum(nickname):
             #     headers={'x-api-key':apikey}
             #     ).json()
             
-
             for g in gamepost['userGames']:
-                
 
-                if g['matchingMode'] !=3:
+                if g['versionMajor'] < 7:
+
+                    return JsonResponse(userNum_json)
+                
+                elif g['matchingMode']!=2 and g['matchingMode']!=3:
                     continue
-
-                userrecord = Record.objects.create(
-                    gamenumber = game['gameId'],
-                    user = g['nickname'],
-                    character = g['characterNum'],
-                    beforemmr = g['mmrBefore'],
-                    aftermmr = g['mmrAfter'],
-                    gamerank = g['gameRank'],
-                    playerkill = g['playerKill'],
-                    playerAss = g['playerAssistant'],
-                    mosterkill = g['monsterKill'],
-                    startDtm = g['startDtm'],
-                    mmrGain = g['mmrGain'],
-                    damageToPlayer = g['damageToPlayer'],
-                    damageToMonster  = g['damageToMonster'],
-                    premaid  = g['preMade'],
-                    useWard  = g['addSurveillanceCamera']+g['addTelephotoCamera'],
-                    escapeState = g['escapeState'],
-                    tacticalSkillGroup = tacticalskill[g['tacticalSkillGroup']],
-                    tacticalSkillLevel = g['tacticalSkillLevel'],
-                    bestWeapon = weapon_data[str(g['bestWeapon'])],
-                    traitFirstCore = traitinfo[g['traitFirstCore']],
-                    traitFirstSub1 =g['traitFirstSub'][0],
-                    traitFirstSub2 =g['traitFirstSub'][1],
-                    traitSecondSub1 =g['traitSecondSub'][0],
-                    traitSecondSub2 =g['traitSecondSub'][1],
-                    matchingMode = g['matchingMode'],
-                    season = g['seasonId']
-                )
                 
+                elif g['matchingMode']==3:
+                
+                    userrecord = Record.objects.create(
+                        gamenumber = game['gameId'],
+                        user = g['nickname'],
+                        character = g['characterNum'],
+                        beforemmr = g['mmrBefore'],
+                        aftermmr = g['mmrAfter'],
+                        gamerank = g['gameRank'],
+                        playerkill = g['playerKill'],
+                        playerAss = g['playerAssistant'],
+                        mosterkill = g['monsterKill'],
+                        startDtm = g['startDtm'],
+                        mmrGain = g['mmrGain'],
+                        damageToPlayer = g['damageToPlayer'],
+                        damageToMonster  = g['damageToMonster'],
+                        premaid  = g['preMade'],
+                        useWard  = g['addSurveillanceCamera']+g['addTelephotoCamera'],
+                        escapeState = g['escapeState'],
+                        tacticalSkillGroup = tacticalskill[g['tacticalSkillGroup']],
+                        tacticalSkillLevel = g['tacticalSkillLevel'],
+                        bestWeapon = weapon_data[str(g['bestWeapon'])],
+                        traitFirstCore = traitinfo[g['traitFirstCore']],
+                        traitFirstSub1 =g['traitFirstSub'][0],
+                        traitFirstSub2 =g['traitFirstSub'][1],
+                        traitSecondSub1 =g['traitSecondSub'][0],
+                        traitSecondSub2 =g['traitSecondSub'][1],
+                        matchingMode = g['matchingMode'],
+                        season = g['seasonId']
+                    )
+
+                else:
+                    #노말이면 일부 요소 제거
+                    userrecord = Record.objects.create(
+                        gamenumber = game['gameId'],
+                        user = g['nickname'],
+                        character = g['characterNum'],
+                        beforemmr = 0,
+                        aftermmr = 0,
+                        gamerank = g['gameRank'],
+                        playerkill = g['playerKill'],
+                        playerAss = g['playerAssistant'],
+                        mosterkill = g['monsterKill'],
+                        startDtm = g['startDtm'],
+                        mmrGain = 0,
+                        damageToPlayer = g['damageToPlayer'],
+                        damageToMonster  = g['damageToMonster'],
+                        premaid  = g['preMade'],
+                        useWard  = g['addSurveillanceCamera']+g['addTelephotoCamera'],
+                        escapeState = g['escapeState'],
+                        tacticalSkillGroup = tacticalskill[g['tacticalSkillGroup']],
+                        tacticalSkillLevel = g['tacticalSkillLevel'],
+                        bestWeapon = weapon_data[str(g['bestWeapon'])],
+                        traitFirstCore = traitinfo[g['traitFirstCore']],
+                        traitFirstSub1 =g['traitFirstSub'][0],
+                        traitFirstSub2 =g['traitFirstSub'][1],
+                        traitSecondSub1 =g['traitSecondSub'][0],
+                        traitSecondSub2 =g['traitSecondSub'][1],
+                        matchingMode = g['matchingMode'],
+                        season = g['seasonId']
+                    )
+
                 if '0' in g['equipment']:
                     userrecord.item0 = g['equipment']['0']
                     userrecord.item0_grade = Item.objects.get(itemnumber = userrecord.item0 ).grade
@@ -320,10 +351,7 @@ def getusernum(nickname):
                     
                     continue
 
-                elif game['matchingMode'] !=3:
-                    continue
-
-                elif (now_time - gametime_aware).days >= 14:
+                elif (now_time - gametime_aware).days >= 30:
                     days_check = True
                     break
 
@@ -341,38 +369,75 @@ def getusernum(nickname):
                     #     ).json()
 
                     for g in gamepost['userGames']:
+
+                        if g['versionMajor']<7:
+
+                            return JsonResponse(userNum_json)
                         
-                        if g['matchingMode'] ==2:
+                        elif g['matchingMode']!=2 and g['matchingMode']!=3:
                             continue
 
-                        userrecord = Record.objects.create(
-                            gamenumber = game['gameId'],
-                            user = g['nickname'],
-                            character = g['characterNum'],
-                            beforemmr = g['mmrBefore'],
-                            aftermmr = g['mmrAfter'],
-                            gamerank = g['gameRank'],
-                            playerkill = g['playerKill'],
-                            playerAss = g['playerAssistant'],
-                            mosterkill = g['monsterKill'],
-                            startDtm = g['startDtm'],
-                            mmrGain = g['mmrGain'],
-                            damageToPlayer = g['damageToPlayer'],
-                            damageToMonster  = g['damageToMonster'],
-                            premaid  = g['preMade'],
-                            useWard  = g['addSurveillanceCamera']+g['addTelephotoCamera'],
-                            escapeState = g['escapeState'],
-                            tacticalSkillGroup = tacticalskill[g['tacticalSkillGroup']],
-                            tacticalSkillLevel = g['tacticalSkillLevel'],
-                            bestWeapon = weapon_data[str(g['bestWeapon'])],
-                            traitFirstCore = traitinfo[g['traitFirstCore']],
-                            traitFirstSub1 =g['traitFirstSub'][0],
-                            traitFirstSub2 =g['traitFirstSub'][1],
-                            traitSecondSub1 =g['traitSecondSub'][0],
-                            traitSecondSub2 =g['traitSecondSub'][1],
-                            matchingMode = g['matchingMode'],
-                            season = g['seasonId']
-                        )
+                        elif g['matchingMode']==3:
+                        
+                            userrecord = Record.objects.create(
+                                gamenumber = game['gameId'],
+                                user = g['nickname'],
+                                character = g['characterNum'],
+                                beforemmr = g['mmrBefore'],
+                                aftermmr = g['mmrAfter'],
+                                gamerank = g['gameRank'],
+                                playerkill = g['playerKill'],
+                                playerAss = g['playerAssistant'],
+                                mosterkill = g['monsterKill'],
+                                startDtm = g['startDtm'],
+                                mmrGain = g['mmrGain'],
+                                damageToPlayer = g['damageToPlayer'],
+                                damageToMonster  = g['damageToMonster'],
+                                premaid  = g['preMade'],
+                                useWard  = g['addSurveillanceCamera']+g['addTelephotoCamera'],
+                                escapeState = g['escapeState'],
+                                tacticalSkillGroup = tacticalskill[g['tacticalSkillGroup']],
+                                tacticalSkillLevel = g['tacticalSkillLevel'],
+                                bestWeapon = weapon_data[str(g['bestWeapon'])],
+                                traitFirstCore = traitinfo[g['traitFirstCore']],
+                                traitFirstSub1 =g['traitFirstSub'][0],
+                                traitFirstSub2 =g['traitFirstSub'][1],
+                                traitSecondSub1 =g['traitSecondSub'][0],
+                                traitSecondSub2 =g['traitSecondSub'][1],
+                                matchingMode = g['matchingMode'],
+                                season = g['seasonId']
+                            )
+
+                        else:
+                            userrecord = Record.objects.create(
+                                gamenumber = game['gameId'],
+                                user = g['nickname'],
+                                character = g['characterNum'],
+                                beforemmr = 0,
+                                aftermmr = 0,
+                                gamerank = g['gameRank'],
+                                playerkill = g['playerKill'],
+                                playerAss = g['playerAssistant'],
+                                mosterkill = g['monsterKill'],
+                                startDtm = g['startDtm'],
+                                mmrGain = 0,
+                                damageToPlayer = g['damageToPlayer'],
+                                damageToMonster  = g['damageToMonster'],
+                                premaid  = g['preMade'],
+                                useWard  = g['addSurveillanceCamera']+g['addTelephotoCamera'],
+                                escapeState = g['escapeState'],
+                                tacticalSkillGroup = tacticalskill[g['tacticalSkillGroup']],
+                                tacticalSkillLevel = g['tacticalSkillLevel'],
+                                bestWeapon = weapon_data[str(g['bestWeapon'])],
+                                traitFirstCore = traitinfo[g['traitFirstCore']],
+                                traitFirstSub1 =g['traitFirstSub'][0],
+                                traitFirstSub2 =g['traitFirstSub'][1],
+                                traitSecondSub1 =g['traitSecondSub'][0],
+                                traitSecondSub2 =g['traitSecondSub'][1],
+                                matchingMode = g['matchingMode'],
+                                season = g['seasonId']
+                            )
+
                         if '0' in g['equipment']:
                             userrecord.item0 = g['equipment']['0']
                             userrecord.item0_grade = Item.objects.get(itemnumber = userrecord.item0 ).grade
@@ -436,10 +501,15 @@ def refreshrecord(nickname):
     
     top1000 = requests.get(
     f'https://open-api.bser.io/v1/rank/top/{seasonid}/3',
-    headers={'x-api-key':apikey}).json()['topRanks']
+    headers={'x-api-key':apikey}).json()
 
-    eternity = top1000[199]['mmr']
-    demigod = top1000[799]['mmr']
+    if top1000['code']==404:
+        eternity = 6200
+        demigod = 6200
+    else:
+
+        eternity = top1000['topRanks'][199]['mmr']
+        demigod = top1000['topRanks'][799]['mmr']
 
     
 
@@ -451,7 +521,7 @@ def refreshrecord(nickname):
     ).json()['userStats'][0]
 
     # 처음 검색해서 DB에 유저가 없음
-    if not Gameuser.objects.filter(nickname = userstats['nickname']):
+    if not Gameuser.objects.filter(nickname = userstats['nickname'], season = seasonid):
         Gameuser.objects.create(
             userNum = userstats['userNum'],
             mmr = userstats['mmr'],
@@ -460,11 +530,12 @@ def refreshrecord(nickname):
             totalGames = userstats['totalGames'],
             winrate = round((userstats['totalWins']*100 / userstats['totalGames']),1),
             averageKills = userstats['averageKills'],
+            season = userstats['seasonId']
         )
     
     refreshuser(nickname)
 
-    search_user = Gameuser.objects.get(nickname = nickname)
+    search_user = Gameuser.objects.get(nickname = nickname, season = seasonid)
 
     # 유저 넘버로 유저의 최근 90일 내의 전적을 모두 가져옴
     time.sleep(0.02)
@@ -479,11 +550,8 @@ def refreshrecord(nickname):
         t = game['startDtm']
         gametime = datetime(int(t[0:4]),int(t[5:7]),int(t[8:10]), int(t[11:13]), int(t[14:16]), int(t[17:19]))
         gametime_aware = timezone.make_aware(gametime)
-        if game['matchingMode'] !=3:
 
-            continue
-
-        elif (now_time - gametime_aware).days >= 14:
+        if (now_time - gametime_aware).days >= 30:
             break
 
         else:
@@ -498,44 +566,80 @@ def refreshrecord(nickname):
 
             for g in gamepost['userGames']:
                 
-
-                if g['matchingMode'] !=3:
-                    continue
-
                 try:
-                    ingameuser = Record.objects.get(user=g['nickname'], gamenumber=game['gameId'])
+                    ingameuser = Record.objects.get(user=g['nickname'], gamenumber=game['gameId'], season = seasonid)
                     continue
 
                 except:
+
+                    if g['versionMajor']<7:
+
+                        return JsonResponse(userNum_json)
                     
-                    userrecord = Record.objects.create(
-                        gamenumber = game['gameId'],
-                        user = g['nickname'],
-                        character = g['characterNum'],
-                        beforemmr = g['mmrBefore'],
-                        aftermmr = g['mmrAfter'],
-                        gamerank = g['gameRank'],
-                        playerkill = g['playerKill'],
-                        playerAss = g['playerAssistant'],
-                        mosterkill = g['monsterKill'],
-                        startDtm = g['startDtm'],
-                        mmrGain = g['mmrGain'],
-                        damageToPlayer = g['damageToPlayer'],
-                        damageToMonster  = g['damageToMonster'],
-                        premaid  = g['preMade'],
-                        useWard  = g['addSurveillanceCamera']+g['addTelephotoCamera'],
-                        escapeState = g['escapeState'],
-                        tacticalSkillGroup = tacticalskill[g['tacticalSkillGroup']],
-                        tacticalSkillLevel = g['tacticalSkillLevel'],
-                        bestWeapon = weapon_data[str(g['bestWeapon'])],
-                        traitFirstCore = traitinfo[g['traitFirstCore']],
-                        traitFirstSub1 =g['traitFirstSub'][0],
-                        traitFirstSub2 =g['traitFirstSub'][1],
-                        traitSecondSub1 =g['traitSecondSub'][0],
-                        traitSecondSub2 =g['traitSecondSub'][1],
-                        matchingMode = g['matchingMode'],
-                        season = g['seasonId']
-                    )
+                    elif g['matchingMode']!=2 and g['matchingMode']!=3:
+                        continue
+
+                    if g['matchingMode']==3:
+                    
+                        userrecord = Record.objects.create(
+                            gamenumber = game['gameId'],
+                            user = g['nickname'],
+                            character = g['characterNum'],
+                            beforemmr = g['mmrBefore'],
+                            aftermmr = g['mmrAfter'],
+                            gamerank = g['gameRank'],
+                            playerkill = g['playerKill'],
+                            playerAss = g['playerAssistant'],
+                            mosterkill = g['monsterKill'],
+                            startDtm = g['startDtm'],
+                            mmrGain = g['mmrGain'],
+                            damageToPlayer = g['damageToPlayer'],
+                            damageToMonster  = g['damageToMonster'],
+                            premaid  = g['preMade'],
+                            useWard  = g['addSurveillanceCamera']+g['addTelephotoCamera'],
+                            escapeState = g['escapeState'],
+                            tacticalSkillGroup = tacticalskill[g['tacticalSkillGroup']],
+                            tacticalSkillLevel = g['tacticalSkillLevel'],
+                            bestWeapon = weapon_data[str(g['bestWeapon'])],
+                            traitFirstCore = traitinfo[g['traitFirstCore']],
+                            traitFirstSub1 =g['traitFirstSub'][0],
+                            traitFirstSub2 =g['traitFirstSub'][1],
+                            traitSecondSub1 =g['traitSecondSub'][0],
+                            traitSecondSub2 =g['traitSecondSub'][1],
+                            matchingMode = g['matchingMode'],
+                            season = g['seasonId']
+                        )
+
+                    else:
+                        userrecord = Record.objects.create(
+                            gamenumber = game['gameId'],
+                            user = g['nickname'],
+                            character = g['characterNum'],
+                            beforemmr = 0,
+                            aftermmr = 0,
+                            gamerank = g['gameRank'],
+                            playerkill = g['playerKill'],
+                            playerAss = g['playerAssistant'],
+                            mosterkill = g['monsterKill'],
+                            startDtm = g['startDtm'],
+                            mmrGain = 0,
+                            damageToPlayer = g['damageToPlayer'],
+                            damageToMonster  = g['damageToMonster'],
+                            premaid  = g['preMade'],
+                            useWard  = g['addSurveillanceCamera']+g['addTelephotoCamera'],
+                            escapeState = g['escapeState'],
+                            tacticalSkillGroup = tacticalskill[g['tacticalSkillGroup']],
+                            tacticalSkillLevel = g['tacticalSkillLevel'],
+                            bestWeapon = weapon_data[str(g['bestWeapon'])],
+                            traitFirstCore = traitinfo[g['traitFirstCore']],
+                            traitFirstSub1 =g['traitFirstSub'][0],
+                            traitFirstSub2 =g['traitFirstSub'][1],
+                            traitSecondSub1 =g['traitSecondSub'][0],
+                            traitSecondSub2 =g['traitSecondSub'][1],
+                            matchingMode = g['matchingMode'],
+                            season = g['seasonId']
+                        )
+
                     if '0' in g['equipment']:
                         userrecord.item0 = g['equipment']['0']
                         userrecord.item0_grade = Item.objects.get(itemnumber = userrecord.item0 ).grade
@@ -599,11 +703,7 @@ def refreshrecord(nickname):
                 gametime = datetime(int(t[0:4]),int(t[5:7]),int(t[8:10]), int(t[11:13]), int(t[14:16]), int(t[17:19])  )
                 gametime_aware = timezone.make_aware(gametime)
 
-
-                if game['matchingMode'] !=3:
-                    continue
-
-                elif (now_time - gametime_aware).days >= 14:
+                if (now_time - gametime_aware).days >= 30:
                     days_check = True
                     break
 
@@ -622,43 +722,79 @@ def refreshrecord(nickname):
                     #     ).json()
 
                     for g in gamepost['userGames']:
-                        
-                        if g['matchingMode'] ==2:
-                            continue
 
                         try:
-                            ingameuser = Record.objects.get(user=g['nickname'], gamenumber=game['gameId'])
+                            ingameuser = Record.objects.get(user=g['nickname'], gamenumber=game['gameId'], season=seasonid)
                             continue
+
                         except:
 
-                            userrecord = Record.objects.create(
-                                gamenumber = game['gameId'],
-                                user = g['nickname'],
-                                character = g['characterNum'],
-                                beforemmr = g['mmrBefore'],
-                                aftermmr = g['mmrAfter'],
-                                gamerank = g['gameRank'],
-                                playerkill = g['playerKill'],
-                                playerAss = g['playerAssistant'],
-                                mosterkill = g['monsterKill'],
-                                startDtm = g['startDtm'],
-                                mmrGain = g['mmrGain'],
-                                damageToPlayer = g['damageToPlayer'],
-                                damageToMonster  = g['damageToMonster'],
-                                premaid  = g['preMade'],
-                                useWard  = g['addSurveillanceCamera']+g['addTelephotoCamera'],
-                                escapeState = g['escapeState'],
-                                tacticalSkillGroup = tacticalskill[g['tacticalSkillGroup']],
-                                tacticalSkillLevel = g['tacticalSkillLevel'],
-                                bestWeapon = weapon_data[str(g['bestWeapon'])],
-                                traitFirstCore = traitinfo[g['traitFirstCore']],
-                                traitFirstSub1 =g['traitFirstSub'][0],
-                                traitFirstSub2 =g['traitFirstSub'][1],
-                                traitSecondSub1 =g['traitSecondSub'][0],
-                                traitSecondSub2 =g['traitSecondSub'][1],
-                                matchingMode = g['matchingMode'],
-                                season = g['seasonId']
+                            if g['versionMajor']<7:
+
+                                return JsonResponse(userNum_json)
+                            elif g['matchingMode']!=2 and g['matchingMode']!=3:
+                                continue
+                            if g['matchingMode']==3:
+
+                                userrecord = Record.objects.create(
+                                    gamenumber = game['gameId'],
+                                    user = g['nickname'],
+                                    character = g['characterNum'],
+                                    beforemmr = g['mmrBefore'],
+                                    aftermmr = g['mmrAfter'],
+                                    gamerank = g['gameRank'],
+                                    playerkill = g['playerKill'],
+                                    playerAss = g['playerAssistant'],
+                                    mosterkill = g['monsterKill'],
+                                    startDtm = g['startDtm'],
+                                    mmrGain = g['mmrGain'],
+                                    damageToPlayer = g['damageToPlayer'],
+                                    damageToMonster  = g['damageToMonster'],
+                                    premaid  = g['preMade'],
+                                    useWard  = g['addSurveillanceCamera']+g['addTelephotoCamera'],
+                                    escapeState = g['escapeState'],
+                                    tacticalSkillGroup = tacticalskill[g['tacticalSkillGroup']],
+                                    tacticalSkillLevel = g['tacticalSkillLevel'],
+                                    bestWeapon = weapon_data[str(g['bestWeapon'])],
+                                    traitFirstCore = traitinfo[g['traitFirstCore']],
+                                    traitFirstSub1 =g['traitFirstSub'][0],
+                                    traitFirstSub2 =g['traitFirstSub'][1],
+                                    traitSecondSub1 =g['traitSecondSub'][0],
+                                    traitSecondSub2 =g['traitSecondSub'][1],
+                                    matchingMode = g['matchingMode'],
+                                    season = g['seasonId']
+                                    )
+                                
+                            else:
+                                userrecord = Record.objects.create(
+                                    gamenumber = game['gameId'],
+                                    user = g['nickname'],
+                                    character = g['characterNum'],
+                                    beforemmr = 0,
+                                    aftermmr = 0,
+                                    gamerank = g['gameRank'],
+                                    playerkill = g['playerKill'],
+                                    playerAss = g['playerAssistant'],
+                                    mosterkill = g['monsterKill'],
+                                    startDtm = g['startDtm'],
+                                    mmrGain = 0,
+                                    damageToPlayer = g['damageToPlayer'],
+                                    damageToMonster  = g['damageToMonster'],
+                                    premaid  = g['preMade'],
+                                    useWard  = g['addSurveillanceCamera']+g['addTelephotoCamera'],
+                                    escapeState = g['escapeState'],
+                                    tacticalSkillGroup = tacticalskill[g['tacticalSkillGroup']],
+                                    tacticalSkillLevel = g['tacticalSkillLevel'],
+                                    bestWeapon = weapon_data[str(g['bestWeapon'])],
+                                    traitFirstCore = traitinfo[g['traitFirstCore']],
+                                    traitFirstSub1 =g['traitFirstSub'][0],
+                                    traitFirstSub2 =g['traitFirstSub'][1],
+                                    traitSecondSub1 =g['traitSecondSub'][0],
+                                    traitSecondSub2 =g['traitSecondSub'][1],
+                                    matchingMode = g['matchingMode'],
+                                    season = g['seasonId']
                                 )
+
                             if '0' in g['equipment']:
                                 userrecord.item0 = g['equipment']['0']
                                 userrecord.item0_grade = Item.objects.get(itemnumber = userrecord.item0 ).grade
@@ -724,18 +860,16 @@ class RecordView(ModelViewSet):
         )
 
         try:
-            new_user = Gameuser.objects.get(nickname=self.kwargs.get('nickname'))
+            new_user = Gameuser.objects.get(nickname=self.kwargs.get('nickname'),season = self.kwargs.get('season') )
             
         except:
             
             getusernum(self.kwargs.get('nickname'))
 
-        qs = Record.objects.filter(user=self.kwargs.get('nickname')).order_by('-gamenumber')
+        qs = Record.objects.filter(user=self.kwargs.get('nickname'), season = self.kwargs.get('season')).order_by('-gamenumber')
 
         return qs
     
-        
-
     serializer_class = RecordSerializer
 
 
@@ -744,6 +878,14 @@ class UserDetailView(ModelViewSet):
     queryset = Gameuser.objects.all()
     serializer_class = GameuserSerializer
     lookup_field = 'nickname'
+
+    def retrieve(self, request, *args, **wargs):
+        qureyset = Gameuser.objects.all()
+        user = get_object_or_404(qureyset, nickname=self.kwargs.get('nickname'), season = self.kwargs.get('season'))
+        serializer = GameuserSerializer(user)
+
+        return Response(serializer.data)
+        
 
 class UseChView(ModelViewSet):
 
