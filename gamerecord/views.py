@@ -912,7 +912,7 @@ def recentgainrp(request,nickname,season):
     ch2_dict = defaultdict(int)
 
     userid = Gameuser.objects.get(nickname = nickname, season=season)
-    userrecord = Record.objects.filter(user = userid, startDtm__range=[date.today()-timedelta(days=14),date.today()])
+    userrecord = Record.objects.filter(user = userid, startDtm__range=[date.today()-timedelta(days=14),date.today()], season=season)
 
     for g in userrecord:
         chname = Character.objects.get(id=g.character).name
