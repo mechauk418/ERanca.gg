@@ -223,6 +223,9 @@ def getusernum(nickname, seasonid, limitdays):
 
                     return JsonResponse(userNum_json)
                 
+                elif g['seasonId'] != seasonid:
+                    continue
+                
                 elif g['matchingMode']!=2 and g['matchingMode']!=3:
                     continue
                 
@@ -382,6 +385,9 @@ def getusernum(nickname, seasonid, limitdays):
                         if g['versionMajor']<-2:
 
                             return JsonResponse(userNum_json)
+
+                        elif g['seasonId'] != seasonid:
+                            continue
                         
                         elif g['matchingMode']!=2 and g['matchingMode']!=3:
                             continue
@@ -589,7 +595,8 @@ def refreshrecord(nickname):
                     
                     elif g['matchingMode']!=2 and g['matchingMode']!=3:
                         continue
-
+                    elif g['seasonId'] != seasonid:
+                        continue
                     if g['matchingMode']==3:
                     
                         userrecord = Record.objects.create(
@@ -747,6 +754,8 @@ def refreshrecord(nickname):
                                 return JsonResponse(userNum_json)
                             elif g['matchingMode']!=2 and g['matchingMode']!=3:
                                 continue
+                            elif g['seasonId'] != seasonid:
+                                continue
                             if g['matchingMode']==3:
 
                                 userrecord = Record.objects.create(
@@ -878,7 +887,7 @@ class RecordView(ModelViewSet):
             new_user = Gameuser.objects.get(nickname=self.kwargs.get('nickname'),season = self.kwargs.get('season') )
             
         except:
-            getusernum(self.kwargs.get('nickname'), self.kwargs.get('season'), 30)
+            getusernum(self.kwargs.get('nickname'), self.kwargs.get('season'), 7)
             getusernum(self.kwargs.get('nickname'), 19, 14)
 
         qs = Record.objects.filter(user=self.kwargs.get('nickname'), season = self.kwargs.get('season')).order_by('-gamenumber')
