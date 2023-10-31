@@ -119,7 +119,10 @@ def refreshuser(nickname, seasonid):
     user.mmr = userstats['mmr']
     user.rank = userstats['rank']
     user.totalGames = userstats['totalGames']
-    user.winrate = round((userstats['totalWins']*100 / userstats['totalGames']),1)
+    if userstats['totalGames'] ==0:
+        user.winrate = 0
+    else:
+        user.winrate = round((userstats['totalWins']*100 / userstats['totalGames']),1)
     user.averageKills = userstats['averageKills']
     user.save()
 

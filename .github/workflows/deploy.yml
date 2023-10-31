@@ -30,7 +30,7 @@ jobs:
                 - name: SECRET_KEY
                   value: ${{ secrets.SECRET_KEY }}
                 - name: DEBUG
-                  value: ${{ secrets.DEBUG }}
+                  value: True
                 - name: X_API_KEY
                   value: ${{ secrets.X_API_KEY }}
                 - name: CLOUDTYPE_TOKEN
