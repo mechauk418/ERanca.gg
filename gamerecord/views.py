@@ -98,7 +98,7 @@ traitinfo = {
 }
 
 
-def refreshuser(nickname):
+def refreshuser(nickname, seasonid):
     time.sleep(0.02)
     userNum = requests.get(
         f'https://open-api.bser.io/v1/user/nickname?query={nickname}',
@@ -126,7 +126,7 @@ def refreshuser(nickname):
     return JsonResponse(userNum_json)
 
 
-def getusernum(nickname):
+def getusernum(nickname, seasonid, limitdays):
     sttime = time.time()
     now_time = timezone.localtime(timezone.now())
     # 유저 닉네임으로 유저 정보 받아옴
@@ -145,9 +145,10 @@ def getusernum(nickname):
     f'https://open-api.bser.io/v1/rank/top/{seasonid}/3',
     headers={'x-api-key':apikey}).json()
 
+
     if top1000['code']==404:
-        eternity = 6200
-        demigod = 6200
+        eternity = 9999
+        demigod = 9999
     else:
 
         eternity = top1000['topRanks'][199]['mmr']
@@ -159,7 +160,13 @@ def getusernum(nickname):
     userstats = requests.get(
         f'https://open-api.bser.io/v1/user/stats/{userNum}/{seasonid}',
         headers={'x-api-key':apikey}
-    ).json()['userStats'][0]
+    ).json()
+
+    if userstats['code']== 404 and userstats['message']=='Not Found':
+        return
+    
+    userstats = userstats['userStats'][0]
+
 
     # 처음 검색해서 DB에 유저가 없음
     if not Gameuser.objects.filter(nickname = userstats['nickname'], season = seasonid):
@@ -174,7 +181,7 @@ def getusernum(nickname):
             season = userstats['seasonId']
         )
     
-    refreshuser(nickname)
+    refreshuser(nickname, seasonid)
 
     search_user = Gameuser.objects.get(nickname = nickname, season = seasonid)
 
@@ -195,7 +202,7 @@ def getusernum(nickname):
 
         if len(Record.objects.filter(gamenumber = game['gameId'])):
             continue
-        elif (now_time - gametime_aware).days >= 30:
+        elif (now_time - gametime_aware).days >= limitdays:
             break
         else:
             time.sleep(0.02)
@@ -212,7 +219,7 @@ def getusernum(nickname):
             
             for g in gamepost['userGames']:
 
-                if g['versionMajor'] < 7:
+                if g['versionMajor'] < -2:
 
                     return JsonResponse(userNum_json)
                 
@@ -247,7 +254,8 @@ def getusernum(nickname):
                         traitSecondSub1 =g['traitSecondSub'][0],
                         traitSecondSub2 =g['traitSecondSub'][1],
                         matchingMode = g['matchingMode'],
-                        season = g['seasonId']
+                        season = g['seasonId'],
+                        versionMajor = g['versionMajor']
                     )
 
                 else:
@@ -278,7 +286,8 @@ def getusernum(nickname):
                         traitSecondSub1 =g['traitSecondSub'][0],
                         traitSecondSub2 =g['traitSecondSub'][1],
                         matchingMode = g['matchingMode'],
-                        season = g['seasonId']
+                        season = g['seasonId'],
+                        versionMajor = g['versionMajor']
                     )
 
                 if '0' in g['equipment']:
@@ -351,7 +360,7 @@ def getusernum(nickname):
                     
                     continue
 
-                elif (now_time - gametime_aware).days >= 30:
+                elif (now_time - gametime_aware).days >= limitdays:
                     days_check = True
                     break
 
@@ -370,7 +379,7 @@ def getusernum(nickname):
 
                     for g in gamepost['userGames']:
 
-                        if g['versionMajor']<7:
+                        if g['versionMajor']<-2:
 
                             return JsonResponse(userNum_json)
                         
@@ -405,7 +414,8 @@ def getusernum(nickname):
                                 traitSecondSub1 =g['traitSecondSub'][0],
                                 traitSecondSub2 =g['traitSecondSub'][1],
                                 matchingMode = g['matchingMode'],
-                                season = g['seasonId']
+                                season = g['seasonId'],
+                                versionMajor = g['versionMajor']
                             )
 
                         else:
@@ -435,7 +445,8 @@ def getusernum(nickname):
                                 traitSecondSub1 =g['traitSecondSub'][0],
                                 traitSecondSub2 =g['traitSecondSub'][1],
                                 matchingMode = g['matchingMode'],
-                                season = g['seasonId']
+                                season = g['seasonId'],
+                                versionMajor = g['versionMajor']
                             )
 
                         if '0' in g['equipment']:
@@ -533,7 +544,7 @@ def refreshrecord(nickname):
             season = userstats['seasonId']
         )
     
-    refreshuser(nickname)
+    refreshuser(nickname, seasonid)
 
     search_user = Gameuser.objects.get(nickname = nickname, season = seasonid)
 
@@ -607,7 +618,8 @@ def refreshrecord(nickname):
                             traitSecondSub1 =g['traitSecondSub'][0],
                             traitSecondSub2 =g['traitSecondSub'][1],
                             matchingMode = g['matchingMode'],
-                            season = g['seasonId']
+                            season = g['seasonId'],
+                            versionMajor = g['versionMajor']
                         )
 
                     else:
@@ -637,7 +649,8 @@ def refreshrecord(nickname):
                             traitSecondSub1 =g['traitSecondSub'][0],
                             traitSecondSub2 =g['traitSecondSub'][1],
                             matchingMode = g['matchingMode'],
-                            season = g['seasonId']
+                            season = g['seasonId'],
+                            versionMajor = g['versionMajor']
                         )
 
                     if '0' in g['equipment']:
@@ -762,7 +775,8 @@ def refreshrecord(nickname):
                                     traitSecondSub1 =g['traitSecondSub'][0],
                                     traitSecondSub2 =g['traitSecondSub'][1],
                                     matchingMode = g['matchingMode'],
-                                    season = g['seasonId']
+                                    season = g['seasonId'],
+                                    versionMajor = g['versionMajor']
                                     )
                                 
                             else:
@@ -792,7 +806,8 @@ def refreshrecord(nickname):
                                     traitSecondSub1 =g['traitSecondSub'][0],
                                     traitSecondSub2 =g['traitSecondSub'][1],
                                     matchingMode = g['matchingMode'],
-                                    season = g['seasonId']
+                                    season = g['seasonId'],
+                                    versionMajor = g['versionMajor']
                                 )
 
                             if '0' in g['equipment']:
@@ -863,8 +878,8 @@ class RecordView(ModelViewSet):
             new_user = Gameuser.objects.get(nickname=self.kwargs.get('nickname'),season = self.kwargs.get('season') )
             
         except:
-            
-            getusernum(self.kwargs.get('nickname'))
+            getusernum(self.kwargs.get('nickname'), self.kwargs.get('season'), 30)
+            getusernum(self.kwargs.get('nickname'), 19, 14)
 
         qs = Record.objects.filter(user=self.kwargs.get('nickname'), season = self.kwargs.get('season')).order_by('-gamenumber')
 
