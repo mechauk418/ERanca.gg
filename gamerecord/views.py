@@ -877,6 +877,7 @@ class RecordView(ModelViewSet):
     pagination_class = RecordPage
     filterset_fields = ['character']
     queryset = Record.objects.all()
+    serializer_class = RecordSerializer
 
     def get_queryset(self, *args,**kwargs):
         logger.info('전적검색')
@@ -897,7 +898,15 @@ class RecordView(ModelViewSet):
 
         return qs
     
-    serializer_class = RecordSerializer
+class RecordDetailView(ModelViewSet):
+    pagination_class = None
+    queryset = Record.objects.all()
+    def get_queryset(self):
+        qs = Record.objects.filter(gamenumber = self.kwargs.get('gamenumber')).order_by('gamerank')
+        return qs
+
+    serializer_class = GameDetailSerializer
+    lookup_field = 'gamenumber'
 
 
 class UserDetailView(ModelViewSet):

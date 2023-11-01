@@ -96,9 +96,8 @@ class GameuserSerializer(serializers.ModelSerializer):
         model = Gameuser
         fields = '__all__'
 
-class RecordSerializer(serializers.ModelSerializer):
 
-    gamedetail = serializers.SerializerMethodField()
+class RecordSerializer(serializers.ModelSerializer):
     
     playcharacter = serializers.SerializerMethodField()
 
@@ -106,12 +105,6 @@ class RecordSerializer(serializers.ModelSerializer):
         ch = Character.objects.get(id=obj.character)
         
         return ch.name
-
-    def get_gamedetail(self,obj):
-        data = Record.objects.filter(gamenumber = obj.gamenumber).order_by('gamerank')
-
-        return GameDetailSerializer(instance=data, many=True, context = self.context).data
-
 
     whenplay = serializers.SerializerMethodField()
 
