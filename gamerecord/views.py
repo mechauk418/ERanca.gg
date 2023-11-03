@@ -126,7 +126,7 @@ def refreshuser(nickname, seasonid):
     user.averageKills = userstats['averageKills']
     user.save()
 
-    return JsonResponse(userNum_json)
+    return
 
 
 def getusernum(nickname, seasonid, limitdays):
@@ -139,7 +139,12 @@ def getusernum(nickname, seasonid, limitdays):
         headers={'x-api-key':apikey}
     )
     userNum_json = userNum.json()
-    userNum = userNum_json['user']['userNum']
+    if userNum_json['code']==404 and userNum_json['message'] == "Not Found":
+        # raise ValueError('에러')
+        message = {'message':"플레이어를 찾을 수 없습니다."}
+        return (message)
+    else:
+        userNum = userNum_json['user']['userNum']
     
     
     
@@ -166,8 +171,8 @@ def getusernum(nickname, seasonid, limitdays):
     ).json()
 
     if userstats['code']== 404 and userstats['message']=='Not Found':
-        return
-    
+        message = {'message':"이번 시즌 정보가 없습니다."}
+        return (message)
     userstats = userstats['userStats'][0]
 
 
@@ -524,21 +529,25 @@ def refreshrecord(nickname):
     headers={'x-api-key':apikey}).json()
 
     if top1000['code']==404:
-        eternity = 6200
-        demigod = 6200
+        eternity = 9999
+        demigod = 9999
     else:
 
         eternity = top1000['topRanks'][199]['mmr']
         demigod = top1000['topRanks'][799]['mmr']
 
-    
 
     # 유저의 이번 시즌 정보를 받아옴, 19는 정규시즌1 번호
     time.sleep(0.02)
     userstats = requests.get(
         f'https://open-api.bser.io/v1/user/stats/{userNum}/{seasonid}',
         headers={'x-api-key':apikey}
-    ).json()['userStats'][0]
+    ).json()
+
+    if userstats['code'] == 404 and userstats['message'] == "Not Found":
+        return JsonResponse(userstats)
+    else:
+        userstats = userstats['userStats'][0]
 
     # 처음 검색해서 DB에 유저가 없음
     if not Gameuser.objects.filter(nickname = userstats['nickname'], season = seasonid):
@@ -563,6 +572,7 @@ def refreshrecord(nickname):
         f'https://open-api.bser.io/v1/user/games/{userNum}',
         headers={'x-api-key':apikey}
     ).json()
+    
     matchdetail = match['userGames']
     
     # 가져온 전적을 등록하는 과정
@@ -869,6 +879,7 @@ def refreshrecord(nickname):
 
 
 
+
 class RecordPage(PageNumberPagination):
     page_size = 10
 
@@ -876,28 +887,48 @@ class RecordPage(PageNumberPagination):
 class RecordView(ModelViewSet):
     pagination_class = RecordPage
     filterset_fields = ['character']
-    queryset = Record.objects.all()
     serializer_class = RecordSerializer
+    queryset = Record.objects.all()
+    # def get_queryset(self, *args,**kwargs):
+    #     logger.info('전적검색')
+    #     logger.info(self.kwargs.get('nickname'))
+    #     Logs.objects.create(
+    #         whatuse = '전적검색',
+    #         nick1 = self.kwargs.get('nickname')
+    #     )
 
-    def get_queryset(self, *args,**kwargs):
-        logger.info('전적검색')
-        logger.info(self.kwargs.get('nickname'))
-        Logs.objects.create(
-            whatuse = '전적검색',
-            nick1 = self.kwargs.get('nickname')
-        )
+    #     try:
+    #         new_user = Gameuser.objects.get(nickname=self.kwargs.get('nickname'),season = self.kwargs.get('season') )
+            
+    #     except:
+    #         getusernum(self.kwargs.get('nickname'), self.kwargs.get('season'), 7)
+    #         getusernum(self.kwargs.get('nickname'), self.kwargs.get('season')-1, 14)
 
+    #     qs = Record.objects.filter(user=self.kwargs.get('nickname'), season = self.kwargs.get('season')).order_by('-gamenumber')
+
+    #     return qs
+    
+    def list(self, request, *args, **kwargs):
         try:
             new_user = Gameuser.objects.get(nickname=self.kwargs.get('nickname'),season = self.kwargs.get('season') )
             
         except:
-            getusernum(self.kwargs.get('nickname'), self.kwargs.get('season'), 7)
-            getusernum(self.kwargs.get('nickname'), 19, 14)
-
+            usercheck = getusernum(self.kwargs.get('nickname'), self.kwargs.get('season'), 7)
+            if 'message' in usercheck:
+                if usercheck['message'] == '플레이어를 찾을 수 없습니다.':
+                    return JsonResponse(usercheck)
+                else:
+                    getusernum(self.kwargs.get('nickname'), self.kwargs.get('season')-1, 14)
+        
         qs = Record.objects.filter(user=self.kwargs.get('nickname'), season = self.kwargs.get('season')).order_by('-gamenumber')
+        page = self.paginate_queryset(qs)
+        if page is not None:
+            serializer =  RecordSerializer(page,many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer =  RecordSerializer(qs,many=True)
+        return Response(serializer.data)
 
-        return qs
-    
+
 class RecordDetailView(ModelViewSet):
     pagination_class = None
     queryset = Record.objects.all()
@@ -916,11 +947,23 @@ class UserDetailView(ModelViewSet):
     lookup_field = 'nickname'
 
     def retrieve(self, request, *args, **wargs):
-        qureyset = Gameuser.objects.all()
-        user = get_object_or_404(qureyset, nickname=self.kwargs.get('nickname'), season = self.kwargs.get('season'))
-        serializer = GameuserSerializer(user)
-
-        return Response(serializer.data)
+        try:
+            user = Gameuser.objects.get(nickname=self.kwargs.get('nickname'), season = self.kwargs.get('season'))
+            serializer = GameuserSerializer(user)
+            return Response(serializer.data)
+        except:
+            userdetail={
+                'mmr':'-',
+                'nickname':self.kwargs.get('nickname'),
+                'rank':'-',
+                'totalGames':'-',
+                'winrate':'-',
+                'averageKills':'-',
+                'averageDamage':'-',
+                'winrate':0,
+                "message":"시즌 정보가 없습니다."
+            }
+            return JsonResponse(userdetail)
         
 
 class UseChView(ModelViewSet):
@@ -931,11 +974,14 @@ class UseChView(ModelViewSet):
     lookup_field = 'nickname'
 
     def retrieve(self, request, *args, **wargs):
-        qureyset = Gameuser.objects.all()
-        user = get_object_or_404(qureyset, nickname=self.kwargs.get('nickname'), season = self.kwargs.get('season'))
-        serializer = UserUseSerializer(user)
+        try:
+            user = Gameuser.objects.get(nickname=self.kwargs.get('nickname'), season = self.kwargs.get('season'))
+            serializer = UserUseSerializer(user)
+            return Response(serializer.data)
+        except:
+            return JsonResponse({"usechrank":[]})
 
-        return Response(serializer.data)
+        
 
 
 
@@ -946,8 +992,10 @@ def recentgainrp(request,nickname,season):
     
     ch_dict = defaultdict(int)
     ch2_dict = defaultdict(int)
-
-    userid = Gameuser.objects.get(nickname = nickname, season=season)
+    try:
+        userid = Gameuser.objects.get(nickname = nickname, season=season)
+    except:
+        return JsonResponse({"result":[]})
     userrecord = Record.objects.filter(user = userid, startDtm__range=[date.today()-timedelta(days=14),date.today()], season=season)
 
     for g in userrecord:
