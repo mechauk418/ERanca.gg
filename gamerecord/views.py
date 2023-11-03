@@ -921,6 +921,7 @@ class RecordView(ModelViewSet):
                     getusernum(self.kwargs.get('nickname'), self.kwargs.get('season')-1, 14)
         
         qs = Record.objects.filter(user=self.kwargs.get('nickname'), season = self.kwargs.get('season')).order_by('-gamenumber')
+        qs = self.filter_queryset(qs)
         page = self.paginate_queryset(qs)
         if page is not None:
             serializer =  RecordSerializer(page,many=True)
