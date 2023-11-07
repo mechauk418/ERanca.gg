@@ -1189,7 +1189,6 @@ def detect_text(request):
         eternity = top1000['topRanks'][199]['mmr']
         demigod = top1000['topRanks'][799]['mmr']
     
-
     client = vision.ImageAnnotatorClient()
     base64img = base64.b64decode(path)
     img = Image.open(io.BytesIO(base64img))
@@ -1202,17 +1201,15 @@ def detect_text(request):
     crop4=(1950/2160)*img_w
 
     img_crop = img.crop((crop1,crop3,crop2,crop4))
-    img_crop.show()
 
     buffer = io.BytesIO()
     img_crop.save(buffer,format='PNG')
     img_data = buffer.getvalue()
     
+    
     image = vision.Image(content=img_data)
-
     response = client.text_detection(image=image)
     texts = response.text_annotations
-    
     nicklist=[]
     
 
@@ -1220,7 +1217,7 @@ def detect_text(request):
         temt = text.description
         nicklist = temt.split('\n')
         break
-
+    print(nicklist)
     logger.info('이미지 전적 검색')
     logger.info(nicklist)
     
@@ -1228,7 +1225,7 @@ def detect_text(request):
             whatuse = '이미지검색',
             nick1 = temt,
         )
-
+    
     multilist = {}
     for nickname in nicklist:
         userNum = requests.get(
@@ -1238,47 +1235,59 @@ def detect_text(request):
         userNum_json = userNum.json()
         if 'user' not in userNum_json:
             continue
-
         userNum = userNum_json['user']['userNum']
         userstats = requests.get(
             f'https://open-api.bser.io/v1/user/stats/{userNum}/{seasonid}',
             headers={'x-api-key':apikey}
-        ).json()['userStats'][0]
-        logger.info('검색된 유저 mmr')
-        logger.info(userstats['mmr'])
-        temtdict = {}
+        ).json()
+        temtdict={}
+        if userstats['code']==404 and userstats['message']=='Not Found':
+            temtdict = {
+                'mmr':'-',
+                'tier':'-',
+                'grade':'-',
+                'rp':'-',
+                'nickname':nickname,
+                'totalGames':'-',
+                'totalWins':'-',
+                'winrate':'-',
+                'averageKills':'-',
+            }
 
-        if userstats['mmr'] < 6000:
-            temtdict['tier'] = tiervalue[userstats['mmr']//1000]
-            temtdict['grade'] = gradevalue[(userstats['mmr']%1000)//250]
-            temtdict['rp'] = userstats['mmr']%250
         else:
-            temtdict['rp'] = userstats['mmr']-6000
-            if userstats['mmr'] >= eternity:
-                temtdict['tier'] = '이터니티'
-                temtdict['grade']=''
-            elif userstats['mmr'] >= demigod:
-                temtdict['tier'] = '데미갓'
-                temtdict['grade']=''
+            userstats=userstats['userStats'][0]
+            
+            logger.info('검색된 유저 mmr')
+            logger.info(userstats['mmr'])
+            if userstats['mmr'] < 6000:
+                temtdict['tier'] = tiervalue[userstats['mmr']//1000]
+                temtdict['grade'] = gradevalue[(userstats['mmr']%1000)//250]
+                temtdict['rp'] = userstats['mmr']%250
             else:
-                temtdict['tier'] = '미스릴'
-                temtdict['grade']=''
+                temtdict['rp'] = userstats['mmr']-6000
+                if userstats['mmr'] >= eternity:
+                    temtdict['tier'] = '이터니티'
+                    temtdict['grade']=''
+                elif userstats['mmr'] >= demigod:
+                    temtdict['tier'] = '데미갓'
+                    temtdict['grade']=''
+                else:
+                    temtdict['tier'] = '미스릴'
+                    temtdict['grade']=''
 
 
+            temtdict['nickname']=userstats['nickname']
+            temtdict['totalGames']=userstats['totalGames']
+            temtdict['totalWins']=userstats['totalWins']
+            temtdict['winrate']=round((userstats['totalWins']*100)/userstats['totalGames'],1)
+            temtdict['averageKills']=userstats['averageKills']
 
-        temtdict['nickname']=userstats['nickname']
-        temtdict['totalGames']=userstats['totalGames']
-        temtdict['totalWins']=userstats['totalWins']
-        temtdict['winrate']=round((userstats['totalWins']*100)/userstats['totalGames'],1)
-        temtdict['averageKills']=userstats['averageKills']
+            mostcharacternumber = len(userstats['characterStats'])
+            
+            for i in range(mostcharacternumber):
+                temtdict[f'most{i+1}'] = Character.objects.get(id=userstats['characterStats'][i]['characterCode']).name
+                temtdict[f'most{i+1}_play'] = round((userstats['characterStats'][i]['totalGames']*100)/userstats['totalGames'],1)
 
-
-        temtdict['most1']= Character.objects.get(id=userstats['characterStats'][0]['characterCode']).name
-        temtdict['most1_play'] = round((userstats['characterStats'][0]['totalGames']*100)/userstats['totalGames'],1)
-        temtdict['most2']=Character.objects.get(id=userstats['characterStats'][1]['characterCode']).name
-        temtdict['most2_play'] = round((userstats['characterStats'][1]['totalGames']*100)/userstats['totalGames'],1)
-        temtdict['most3']=Character.objects.get(id=userstats['characterStats'][2]['characterCode']).name
-        temtdict['most3_play'] = round((userstats['characterStats'][2]['totalGames']*100)/userstats['totalGames'],1)
 
         multilist[nickname]=temtdict
 
