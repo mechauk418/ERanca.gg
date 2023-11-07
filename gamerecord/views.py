@@ -1292,6 +1292,3 @@ def detect_text(request):
         multilist[nickname]=temtdict
 
     return JsonResponse(multilist)
-
-
-print(os.environ)
