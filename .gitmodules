@@ -1,0 +1,3 @@
+[submodule "GCPJson"]
+	path = GCPJson
+	url = https://github.com/mechauk418/GCPJson.git

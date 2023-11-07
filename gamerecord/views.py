@@ -131,6 +131,7 @@ def refreshuser(nickname, seasonid):
 
 def getusernum(nickname, seasonid, limitdays):
     sttime = time.time()
+    print(sttime)
     now_time = timezone.localtime(timezone.now())
     # 유저 닉네임으로 유저 정보 받아옴
     time.sleep(0.02)
@@ -192,7 +193,8 @@ def getusernum(nickname, seasonid, limitdays):
     refreshuser(nickname, seasonid)
 
     search_user = Gameuser.objects.get(nickname = nickname, season = seasonid)
-
+    search_user.updatedate = now_time
+    search_user.save()
     # 유저 넘버로 유저의 최근 90일 내의 전적을 모두 가져옴
     time.sleep(0.02)
     match = requests.get(
@@ -226,7 +228,7 @@ def getusernum(nickname, seasonid, limitdays):
             #     ).json()
             
             for g in gamepost['userGames']:
-
+                
                 if g['versionMajor'] < -2:
 
                     return JsonResponse(userNum_json)
@@ -389,7 +391,6 @@ def getusernum(nickname, seasonid, limitdays):
                     #     ).json()
 
                     for g in gamepost['userGames']:
-
                         if g['versionMajor']<-2:
 
                             return JsonResponse(userNum_json)
@@ -505,8 +506,7 @@ def getusernum(nickname, seasonid, limitdays):
                 break
 
     edtime = time.time()
-    search_user.updatedate = now_time
-    search_user.save()
+
 
     return JsonResponse(userNum_json)
 
@@ -565,6 +565,8 @@ def refreshrecord(nickname):
     refreshuser(nickname, seasonid)
 
     search_user = Gameuser.objects.get(nickname = nickname, season = seasonid)
+    search_user.updatedate = now_time
+    search_user.save()
 
     # 유저 넘버로 유저의 최근 90일 내의 전적을 모두 가져옴
     time.sleep(0.02)
@@ -601,8 +603,8 @@ def refreshrecord(nickname):
                     continue
 
                 except:
-
-                    if g['versionMajor']<7:
+                    
+                    if g['versionMajor']<versionMajor:
 
                         return JsonResponse(userNum_json)
                     
@@ -755,14 +757,14 @@ def refreshrecord(nickname):
                     #     ).json()
 
                     for g in gamepost['userGames']:
-
+                        
                         try:
                             ingameuser = Record.objects.get(user=g['nickname'], gamenumber=game['gameId'], season=seasonid)
                             continue
 
                         except:
-
-                            if g['versionMajor']<7:
+                            
+                            if g['versionMajor']<versionMajor:
 
                                 return JsonResponse(userNum_json)
                             elif g['matchingMode']!=2 and g['matchingMode']!=3:
@@ -872,8 +874,7 @@ def refreshrecord(nickname):
                 break
 
     edtime = time.time()
-    search_user.updatedate = now_time
-    search_user.save()
+    
 
     return JsonResponse(userNum_json)
 
@@ -1172,16 +1173,23 @@ from google.cloud import vision
 
 @csrf_exempt
 def detect_text(request):
+    print('crop start')
     testdata = json.loads(request.body)
     path = testdata['imgurl'][22:]
 
     top1000 = requests.get(
     f'https://open-api.bser.io/v1/rank/top/{seasonid}/3',
-    headers={'x-api-key':apikey}).json()['topRanks']
+    headers={'x-api-key':apikey}).json()
 
-    eternity = top1000[199]['mmr']
-    demigod = top1000[799]['mmr']
+    if top1000['code']==404:
+        eternity = 9999
+        demigod = 9999
+    else:
+
+        eternity = top1000['topRanks'][199]['mmr']
+        demigod = top1000['topRanks'][799]['mmr']
     
+
     client = vision.ImageAnnotatorClient()
     base64img = base64.b64decode(path)
     img = Image.open(io.BytesIO(base64img))
@@ -1194,6 +1202,7 @@ def detect_text(request):
     crop4=(1950/2160)*img_w
 
     img_crop = img.crop((crop1,crop3,crop2,crop4))
+    img_crop.show()
 
     buffer = io.BytesIO()
     img_crop.save(buffer,format='PNG')
@@ -1214,7 +1223,7 @@ def detect_text(request):
 
     logger.info('이미지 전적 검색')
     logger.info(nicklist)
-
+    
     Logs.objects.create(
             whatuse = '이미지검색',
             nick1 = temt,
