@@ -131,7 +131,7 @@ def refreshuser(nickname, seasonid):
 
 def getusernum(nickname, seasonid, limitdays):
     sttime = time.time()
-    print(sttime)
+    
     now_time = timezone.localtime(timezone.now())
     # 유저 닉네임으로 유저 정보 받아옴
     time.sleep(0.02)
@@ -1173,7 +1173,7 @@ from google.cloud import vision
 
 @csrf_exempt
 def detect_text(request):
-    print('crop start')
+    
     testdata = json.loads(request.body)
     path = testdata['imgurl'][22:]
 
