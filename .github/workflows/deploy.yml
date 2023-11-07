@@ -10,7 +10,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          ghtoken: ${{ secrets.GHP_TOKEN }}
+          token: ${{ secrets.GHP_TOKEN }}
           submodules: true
       - name: Connect deploy key
         uses: cloudtype-github-actions/connect@v1
