@@ -1293,3 +1293,5 @@ def detect_text(request):
 
     return JsonResponse(multilist)
 
+
+print(os.environ)
