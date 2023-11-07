@@ -1,3 +1,6 @@
 [submodule "GCPJson"]
 	path = GCPJson
 	url = https://github.com/mechauk418/GCPJson.git
+[submodule "Sbmtest"]
+	path = Sbmtest
+	url = https://github.com/mechauk418/Sbmtest.git
