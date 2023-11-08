@@ -21,6 +21,13 @@ jobs:
           name: "GOOGLE_APPLICATION_CREDENTIALS.json"
           json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
           dir: '/'
+      - name: create-json
+        id: create-json
+        uses: jsdaniell/create-json@v1.2.2
+        with:
+          name: "test123.json"
+          json: '{"name":"jsdaniell", "password":"mypass"}'
+          dir: '/'
       - name: Deploy
         uses: cloudtype-github-actions/deploy@v1
         with:
