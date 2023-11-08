@@ -21,8 +21,8 @@ jobs:
           name: "GOOGLE_APPLICATION_CREDENTIALS.json"
           json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
           dir: '/'
-      - name: create-json
-        id: create-json
+      - name: create-json2
+        id: create-json2
         uses: jsdaniell/create-json@v1.2.2
         with:
           name: "test123.json"
