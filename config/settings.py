@@ -307,8 +307,6 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
 GOOGLE_APPLICATION_CREDENTIALS = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
 
-print(os.environ)
-
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,

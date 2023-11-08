@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3.9.0
 WORKDIR /usr/src/app
 
 ## Install packages
@@ -13,4 +13,4 @@ EXPOSE 8000
 
 # gunicorn 배포 명령어
 # CMD ["gunicorn", "--bind", "허용하는 IP:열어줄 포트", "project.wsgi:application"]
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "stock.wsgi:application"]
+CMD ["bash", "-c", "python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py collectstatic --noinput && python3 manage.py runserver 0:8000 --noreload"]
