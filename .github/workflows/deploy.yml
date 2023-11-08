@@ -1,68 +1,57 @@
-name: Deploy to cloudtype
+name: Create and publish a Docker image to user's own registry, Deploy to Cloudtype
+
 on:
   push:
     branches:
-      - master
+      - main
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
-  deploy:
+  build-and-push-image:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Connect deploy key
-        uses: cloudtype-github-actions/connect@v1
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
-          token: ${{ secrets.CLOUDTYPE_TOKEN }}
-          ghtoken: ${{ secrets.GHP_TOKEN }}
-      - name: Deploy
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHP_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Deploy to Cloudtype
         uses: cloudtype-github-actions/deploy@v1
         with:
           token: ${{ secrets.CLOUDTYPE_TOKEN }}
           project: mechauk418/eranca-gg
           stage: main
-          yaml: >
+          yaml: |
             name: eranca-gg
-
-            app: python@3.9
-
+            app: container
             options:
-              env:
-                - name: SECRET_KEY
-                  value: ${{ secrets.SECRET_KEY }}
-                - name: DEBUG
-                  value: True
-                - name: X_API_KEY
-                  value: ${{ secrets.X_API_KEY }}
-                - name: CLOUDTYPE_TOKEN
-                  value: ${{ secrets.CLOUDTYPE_TOKEN }}
-                - name: GHP_TOKEN
-                  value: ${{ secrets.GHP_TOKEN }}
-                - name: DATABASE_HOST
-                  value: ${{ secrets.DATABASE_HOST }}
-                - name: DATABASE_PASSWORD
-                  value: ${{ secrets.DATABASE_PASSWORD }}
-                - name: DATABASE_NAME
-                  value: ${{ secrets.DATABASE_NAME }}
-                - name: AWS_ACCESS_KEY_ID
-                  value: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                - name: AWS_SECRET_ACCESS_KEY
-                  value: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                - name: AWS_STORAGE_BUCKET_NAME
-                  value: ${{ secrets.AWS_STORAGE_BUCKET_NAME }}
-                - name: GCP_CLIENT_ID
-                  value: ${{ secrets.GCP_CLIENT_ID }}
-                - name: GCP_PRIVATE_KEY
-                  value: ${{ secrets.GCP_PRIVATE_KEY }}
-                - name: GCP_PRIVATE_KEY_ID
-                  value: ${{ secrets.GCP_PRIVATE_KEY_ID }}
-                - name: GOOGLE_APPLICATION_CREDENTIALS
-                  value: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-
               ports: "8000"
-              start: python3 manage.py runserver 0:8000 --noreload
-              prestart: python3 manage.py makemigrations && python3 manage.py migrate &&
-                python3 manage.py collectstatic --noinput
-            context:
-              git:
-                url: git@github.com:${{ github.repository }}.git
-                ref: ${{ github.ref }}
+              image: ${{ steps.meta.outputs.tags }}
