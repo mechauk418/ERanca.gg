@@ -9,14 +9,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.GHP_TOKEN }}
-          submodules: true
       - name: Connect deploy key
         uses: cloudtype-github-actions/connect@v1
         with:
           token: ${{ secrets.CLOUDTYPE_TOKEN }}
           ghtoken: ${{ secrets.GHP_TOKEN }}
+      - name: create-json
+        id: create-json
+        uses: jsdaniell/create-json@v1.2.2
+        with:
+          name: "GOOGLE_APPLICATION_CREDENTIALS.json"
+          json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          dir: '/'
       - name: Deploy
         uses: cloudtype-github-actions/deploy@v1
         with:

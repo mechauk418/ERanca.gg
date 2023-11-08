@@ -1292,9 +1292,3 @@ def detect_text(request):
         multilist[nickname]=temtdict
 
     return JsonResponse(multilist)
-
-
-f=open('./Sbmtest/testtxt.txt','r')
-line = f.readline()
-print(line)
-f.close()
