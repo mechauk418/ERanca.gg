@@ -9,21 +9,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.GHP_TOKEN }}
-          submodules: true
       - name: Connect deploy key
         uses: cloudtype-github-actions/connect@v1
         with:
           token: ${{ secrets.CLOUDTYPE_TOKEN }}
           ghtoken: ${{ secrets.GHP_TOKEN }}
-      - name: deploy
+      - name: Deploy
         uses: cloudtype-github-actions/deploy@v1
         with:
           token: ${{ secrets.CLOUDTYPE_TOKEN }}
           project: mechauk418/eranca-gg
           stage: main
-          yaml: >
+          yaml: |
             name: eranca-gg
             app: python@3.9
             options:
@@ -56,7 +53,7 @@ jobs:
                   value: ${{ secrets.GCP_PRIVATE_KEY }}
                 - name: GCP_PRIVATE_KEY_ID
                   value: ${{ secrets.GCP_PRIVATE_KEY_ID }}
-              ports: "8000"
+              ports: 8000
               start: python3 manage.py runserver 0:8000 --noreload
               prestart: python3 manage.py makemigrations && python3 manage.py migrate &&
                 python3 manage.py collectstatic --noinput
