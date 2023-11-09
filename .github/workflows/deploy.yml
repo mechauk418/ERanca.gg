@@ -14,10 +14,13 @@ jobs:
         with:
           token: ${{ secrets.CLOUDTYPE_TOKEN }}
           ghtoken: ${{ secrets.GHP_TOKEN }}
-      - name: create-secret
-        run: |
-          touch secrets.json
-          echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" >> secrets.json
+      - name: create-json
+        id: create-json
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "gcp.json"
+          json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          dir: 'gamerecord/'
       - name: Deploy
         uses: cloudtype-github-actions/deploy@v1
         with:
