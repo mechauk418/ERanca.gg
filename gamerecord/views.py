@@ -1173,7 +1173,7 @@ from google.cloud import vision
 
 @csrf_exempt
 def detect_text(request):
-    
+    print('gcp test0')
     testdata = json.loads(request.body)
     path = testdata['imgurl'][22:]
 
@@ -1205,13 +1205,14 @@ def detect_text(request):
     buffer = io.BytesIO()
     img_crop.save(buffer,format='PNG')
     img_data = buffer.getvalue()
-    
-    
+
+    print('gcp test1')
     image = vision.Image(content=img_data)
     response = client.text_detection(image=image)
     texts = response.text_annotations
     nicklist=[]
     
+    print('gcp test2')
 
     for text in texts:
         temt = text.description
