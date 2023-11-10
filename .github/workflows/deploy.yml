@@ -20,6 +20,7 @@ jobs:
         with:
           name: "gcp.json"
           json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          dir: 'app/'
       - name: Deploy
         uses: cloudtype-github-actions/deploy@v1
         with:
