@@ -1189,7 +1189,11 @@ def detect_text(request):
         eternity = top1000['topRanks'][199]['mmr']
         demigod = top1000['topRanks'][799]['mmr']
     
-    client = vision.ImageAnnotatorClient()
+    try:
+        client = vision.ImageAnnotatorClient()
+        print(client)
+    except:
+        print('fail')
     base64img = base64.b64decode(path)
     img = Image.open(io.BytesIO(base64img))
     img_h,img_w = img.size
