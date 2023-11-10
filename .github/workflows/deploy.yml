@@ -60,9 +60,9 @@ jobs:
                 - name: GCP_PRIVATE_KEY_ID
                   value: ${{ secrets.GCP_PRIVATE_KEY_ID }}
                 - name: GOOGLE_APPLICATION_CREDENTIALS
-                  vlaue: Testyml
+                  vlaue: 'Testyml'
                 - name: TESTEKRS
-                  vlaue: Testyml123
+                  vlaue: ${{ secrets.GCP_PRIVATE_KEY_ID }}
               ports: 8000
               start: python3 manage.py runserver 0:8000 --noreload
               prestart: python3 manage.py makemigrations && python3 manage.py migrate &&
