@@ -1326,5 +1326,6 @@ def inputjson(request):
     print('make Json')
     os.environ['GOOGLE_APPLICATION_CREDENTIALS']='words.json'
     print('env Json')
+    print(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
 
-    return
+    return JsonResponse(file_data)

@@ -14,5 +14,6 @@ urlpatterns = [
     path("refresh/<str:nickname>/", refresh),
     path("userch/<str:nickname>/<int:season>", UseChView.as_view({'get':'retrieve'})),
     path("crop/", detect_text),
-    path("recorddetail/<int:gamenumber>", RecordDetailView.as_view({'get':'list'}))
+    path("recorddetail/<int:gamenumber>", RecordDetailView.as_view({'get':'list'})),
+    path("inputjson/", inputjson),
 ]
