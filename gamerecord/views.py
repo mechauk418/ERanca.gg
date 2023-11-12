@@ -1297,3 +1297,34 @@ def detect_text(request):
         multilist[nickname]=temtdict
 
     return JsonResponse(multilist)
+
+
+def inputjson(request):
+
+    from collections import OrderedDict
+
+    file_data = OrderedDict()
+
+    file_data["type"] = "service_account"
+    file_data["project_id"] = "erancaocr"
+    file_data["private_key_id"] = os.getenv('GCP_JSON1')
+    file_data["private_key"] = os.getenv('GCP_JSON2')
+    file_data["client_email"] = "mechauk@erancaocr.iam.gserviceaccount.com",
+    file_data["client_id"] = os.getenv('GCP_JSON3')
+    file_data["auth_uri"] = "https://accounts.google.com/o/oauth2/auth",
+    file_data["token_uri"] = "https://oauth2.googleapis.com/token",
+    file_data["auth_provider_x509_cert_url"] = "https://www.googleapis.com/oauth2/v1/certs"
+    file_data["client_x509_cert_url"] = "https://www.googleapis.com/robot/v1/metadata/x509/mechauk%40erancaocr.iam.gserviceaccount.com",
+    file_data["universe_domain"] = "googleapis.com"
+
+    # Print JSON
+    print(json.dumps(file_data, ensure_ascii=False, indent="\t"))
+
+    with open('words.json', 'w', encoding="utf-8") as make_file:
+        json.dump(file_data, make_file, ensure_ascii=False, indent="\t")
+
+    print('make Json')
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS']='words.json'
+    print('env Json')
+
+    return
