@@ -14,12 +14,6 @@ jobs:
         with:
           token: ${{ secrets.CLOUDTYPE_TOKEN }}
           ghtoken: ${{ secrets.GHP_TOKEN }}
-      - name: create-json
-        id: create-json
-        uses: jsdaniell/create-json@1.1.2
-        with:
-          name: "gcp.json"
-          json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       - name: Deploy
         uses: cloudtype-github-actions/deploy@v1
         with:
@@ -59,6 +53,12 @@ jobs:
                   value: ${{ secrets.GCP_PRIVATE_KEY }}
                 - name: GCP_PRIVATE_KEY_ID
                   value: ${{ secrets.GCP_PRIVATE_KEY_ID }}
+                - name: GCP_JSON1
+                  value: ${{ secrets.GCP_JSON1 }}
+                - name: GCP_JSON2
+                  value: ${{ secrets.GCP_JSON2 }}
+                - name: GCP_JSON3
+                  value: ${{ secrets.GCP_JSON3 }}
               ports: 8000
               start: python3 manage.py runserver 0:8000 --noreload
               prestart: python3 manage.py makemigrations && python3 manage.py migrate &&
