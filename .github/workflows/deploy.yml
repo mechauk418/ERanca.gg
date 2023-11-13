@@ -55,8 +55,6 @@ jobs:
                   value: ${{ secrets.GCP_PRIVATE_KEY_ID }}
                 - name: GCP_JSON1
                   value: ${{ secrets.GCP_JSON1 }}
-                - name: GCP_JSON2
-                  value: ${{ secrets.GCP_JSON2 }}
                 - name: GCP_JSON3
                   value: ${{ secrets.GCP_JSON3 }}
               ports: 8000
