@@ -161,7 +161,11 @@ def getusernum(nickname, seasonid, limitdays):
     else:
 
         eternity = top1000['topRanks'][199]['mmr']
+        if eternity < 6000:
+            eternity = 9999
         demigod = top1000['topRanks'][799]['mmr']
+        if demigod < 6000:
+            demigod = 9999
     
 
     # 유저의 이번 시즌 정보를 받아옴, 19는 정규시즌1 번호
@@ -534,7 +538,11 @@ def refreshrecord(nickname):
     else:
 
         eternity = top1000['topRanks'][199]['mmr']
+        if eternity < 6000:
+            eternity = 9999
         demigod = top1000['topRanks'][799]['mmr']
+        if demigod < 6000:
+            demigod = 9999
 
 
     # 유저의 이번 시즌 정보를 받아옴, 19는 정규시즌1 번호
