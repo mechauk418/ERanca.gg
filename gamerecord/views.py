@@ -16,8 +16,8 @@ logger = logging.getLogger('gamerecord')
 
 apikey = os.getenv("X_API_KEY")
 
-seasonid = 20 # 정규 프리 시즌2
-versionMajor = 7 # 메이저버전 
+seasonid = 21 # 정규 프리 시즌2
+versionMajor = 8 # 메이저버전 
 
 # 티어, 등급 딕셔너리
 tiervalue = {
@@ -229,7 +229,7 @@ def getusernum(nickname, seasonid, limitdays):
             
             for g in gamepost['userGames']:
                 
-                if g['versionMajor'] < -2:
+                if g['versionMajor'] < 7:
 
                     return JsonResponse(userNum_json)
                 
@@ -914,13 +914,11 @@ class RecordView(ModelViewSet):
             new_user = Gameuser.objects.get(nickname=self.kwargs.get('nickname'),season = self.kwargs.get('season') )
             
         except:
-            usercheck = getusernum(self.kwargs.get('nickname'), self.kwargs.get('season'), 7)
+            usercheck = getusernum(self.kwargs.get('nickname'), self.kwargs.get('season'), 30)
             if 'message' in usercheck:
                 if usercheck['message'] == '플레이어를 찾을 수 없습니다.':
                     return JsonResponse(usercheck)
-                else:
-                    getusernum(self.kwargs.get('nickname'), self.kwargs.get('season')-1, 14)
-        
+                
         qs = Record.objects.filter(user=self.kwargs.get('nickname'), season = self.kwargs.get('season')).order_by('-gamenumber')
         qs = self.filter_queryset(qs)
         page = self.paginate_queryset(qs)
@@ -1173,7 +1171,6 @@ from google.cloud import vision
 
 @csrf_exempt
 def detect_text(request):
-    print('gcp test0')
     testdata = json.loads(request.body)
     path = testdata['imgurl'][22:]
 
@@ -1210,13 +1207,11 @@ def detect_text(request):
     img_crop.save(buffer,format='PNG')
     img_data = buffer.getvalue()
 
-    print('gcp test1')
     image = vision.Image(content=img_data)
     response = client.text_detection(image=image)
     texts = response.text_annotations
     nicklist=[]
     
-    print('gcp test2')
 
     for text in texts:
         temt = text.description
@@ -1297,3 +1292,4 @@ def detect_text(request):
         multilist[nickname]=temtdict
 
     return JsonResponse(multilist)
+

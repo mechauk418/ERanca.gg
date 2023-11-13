@@ -354,11 +354,3 @@ with open('words.json', 'w') as make_file:
     json.dump(file_data, make_file, ensure_ascii=False, indent=2)
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS']='words.json'
-
-from google.cloud import vision
-
-try:
-    client = vision.ImageAnnotatorClient()
-    print(client)
-except:
-    print('fail')
