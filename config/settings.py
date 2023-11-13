@@ -339,7 +339,7 @@ file_data = OrderedDict()
 file_data["type"] = "service_account"
 file_data["project_id"] = "erancaocr"
 file_data["private_key_id"] = os.getenv('GCP_JSON1')
-file_data["private_key"] = os.getenv('GCP_JSON2')
+file_data["private_key"] = "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC6njt3Jbaan7yY\nbNgX+MXUzLt7qymGZPPHnPQN+7ycCR1w1oWR3NkZ/38orcE/1HcOs+mWL+5nLqv/\nCHu6hZ1wwqWSIJZz+Rh+oJ2hG9KyUdlLOKvbp80iD4Ncw8Nc4R9eXevWMRaZbunc\n2OS66EmJOeQP3qJAaJWfB+9vZ9K9HJTqdi9tqsqEsq3iGJigBmdcW/ppm5VUcAcd\nY7QGGcsUpWjJkMzVEoU2cJ7QlH8bwa0EGdlXXjf3UtX7xJTiRwp1rYDIrAcXk3AN\nvlQ3gsTg7clb8x0HF0oLWyOIW/8MtM6gJklkw/eWMHqBPUH7UzvrFUlRDAgbErNE\n1K5rWZS5AgMBAAECggEANB0q8wdrmnuAIbrHj84vhNEVjCAMzRSVBUnd16fUkGh1\nOcUWcNjRIdL5MiVvoYEWLFtuoDvLYjIk4uf+EWTtxgb9ULTb/w/xWK9Gxa5s5NI5\nkamGSKVwAhJ99yJOBLpzVZl52gtESd2w3jUNjup+Wp15hDsCaWUrX0lKgnxmW9vM\nqg4Vf89ZXzTH+rfL0D0eB0KOQVsxaRazYkkP/AwjfpJzqwhFXkvLqqZC1WPPMfVb\n9+fDO/m4dM0Ewl+/kcQcW9xktmvGWTIlUIWOebFC7AEuDfiu/+FLVJiKv6jKsoBe\n5Pk2oruAfIpyoW+EM0M3mq6iUzV8aEwirdEXepyvxwKBgQDn3bGK78NlyLp34AGF\njxEZnWKLONyPWlnemgO/2uf48VexTxz05FQ/hQyDUVMMs15IGI6l9p+1YSEz1rxN\nXH9nA866WT17JRHULfzAlpmEVFRf5RTA2TmjzxMY5jT6G+3A8BJOxU/fLExBSFRR\n5QmkOSGgMAwrrBFrzDd8KuEz+wKBgQDOCty//lmhXThgwyP/tqVqOFp35i1iZCQ1\nolEdpfxi6r6BRnz8a4NSFkXhNtvxPVGU5RzyJ+emSJih80jAIh0E3TXD19Z+gVuo\n1N5NCPbIq0JmNcP1UW0Ov28ZFkzzFnzwnbemcb0xdVsDea+ZdLiaQ2itMdDKQmPR\nRFD/+77H2wKBgBNqjSOFUGeFl5fSOk5k3Jm4hDgEWvPmLQBnBUlbm3FNRHqklVgs\nhqGLErEsbjfyDUMcS1W6gUU/DPi6UqpnxINr3jPcpTlasVODRlcaRWC/bxFYrZQ4\nnIsLHB5JqMYI8K/naqEOBNI7c2dEF0uEUnpeDmLLozlE/3B3eW38aT9hAoGAChuQ\nTr7ciMT48g5AotfD750KGx2olk4RVKw8zHaLFhMr+02I7h0cGRfMn8rAKWp3qRVA\nQUTh4U9oZXF43SwPPmDXtV7OP/B6naKrsR3CdX+pRzhV/5/Z+MI9Yf6tEbPFt0wV\naU3lGRsHtvjuO1n1gGPUK8Lo2jM9kFOIobYo2scCgYEAlXuQ938Qi4csG1S/UiMs\nQXPzqRLMCWpGw4NvEOigTTvSpktV3srsFhk6XczegU0nmT403n0IXswAcuvp/ebc\nhtbjNwabSA5XgpoIrmGT4OG2JSTdS1Xq5WbnhYRgPahwEmK33tdhSyv5YzxzNBuX\ncMtie+kz7GEQhu2U1LuO7ZE=\n-----END PRIVATE KEY-----\n"
 file_data["client_email"] = "mechauk@erancaocr.iam.gserviceaccount.com"
 file_data["client_id"] = os.getenv('GCP_JSON3')
 file_data["auth_uri"] = "https://accounts.google.com/o/oauth2/auth"
@@ -349,26 +349,8 @@ file_data["client_x509_cert_url"] = "https://www.googleapis.com/robot/v1/metadat
 file_data["universe_domain"] = "googleapis.com"
 
 # Print JSON
-print(json.dumps(file_data, ensure_ascii=False, indent="\t"))
 
-with open('words.json', 'w', encoding="utf-8") as make_file:
-    json.dump(file_data, make_file, ensure_ascii=False, indent="\t")
+with open('words.json', 'w') as make_file:
+    json.dump(file_data, make_file, ensure_ascii=False, indent="2")
 
-print('make Json')
 os.environ['GOOGLE_APPLICATION_CREDENTIALS']='words.json'
-print(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
-
-from google.cloud import vision
-
-try:
-    client = vision.ImageAnnotatorClient()
-    print('clinet')
-except:
-    print('fail clinet')
-
-
-with open('words.json', 'r') as f:
-
-    json_data = json.load(f)
-
-print(json.dumps(json_data))
