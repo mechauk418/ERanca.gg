@@ -5,6 +5,8 @@ from character.models import Character
 from django.utils import timezone
 from datetime import datetime, timedelta, date
 import math
+from django.db.models import *
+from django.db.models.functions import Cast
 
 now_time = timezone.localtime(timezone.now())
 
@@ -138,16 +140,15 @@ class UserUseSerializer(serializers.ModelSerializer):
 
     def get_usechrank(self,obj):
         useruselist = []
-        checklist = [] # 중복 체크
-        qs = Record.objects.filter(user = obj.nickname, season=obj.season, matchingMode=3).order_by('character')
-        for i in qs:
-            temt = Character.objects.get(id=i.character)
-            if temt.pk not in checklist:
-                checklist.append(temt.pk)
-                useruselist.append( {'chname': temt.koreanname, 'chnumber':temt.pk} )
+        testqs = Record.objects.filter(user = obj.nickname, season=obj.season, matchingMode=3).values('character').annotate(win= Count(Case(When(gamerank=1, then=1))), allgames= Count('*')).annotate(winrate=ExpressionWrapper(Cast(F('win') * 100, FloatField() ) / Cast(F('allgames'),FloatField()) , output_field=DecimalField(decimal_places=2)))
+        testqs=testqs.annotate(avgDamage = Avg('damageToPlayer')).annotate(avgKill = ExpressionWrapper(Cast(Sum('playerkill') , FloatField() ) / Cast(F('allgames'),FloatField()) , output_field=DecimalField(decimal_places=2))).order_by('-allgames')
 
-            else:
-                continue
+        for i in testqs:
+            temt=i
+            kr = Character.objects.get(id=i['character'])
+            temt['koreanname']=kr.koreanname
+            temt['chname']=kr.name
+            useruselist.append(temt)
 
         return useruselist
 
